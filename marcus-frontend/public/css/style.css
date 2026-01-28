@@ -1,0 +1,71 @@
+/* 1. RESET LAYOUT (BẮT BUỘC ĐỂ KHÔNG BỊ CO GIỮA) */
+:root {
+  /* Bộ màu FPT Style */
+  --bs-blue: #0054a6; /* Xanh dương đậm (Logo FPT) */
+  --bs-orange: #f26f21; /* Cam (Điểm nhấn) */
+  --bs-green: #28a745; /* Xanh lá (Nút Mua/Giỏ hàng) */
+  --bs-white: #ffffff;
+  --bs-dark: #333333;
+}
+
+body {
+  margin: 0;
+  display: block !important; /* Quan trọng: Gỡ bỏ display:flex của Vite */
+  width: 100% !important;
+  min-width: 320px;
+  background-color: #f5f5f5; /* Nền xám nhẹ cho sang */
+}
+
+#app {
+  max-width: 100% !important; /* Bung full chiều rộng */
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+/* 2. ĐỊNH NGHĨA LẠI NÚT BẤM (BOOTSTRAP OVERRIDE) */
+/* Nút Xanh Dương (Primary) */
+.btn-primary {
+  background-color: var(--bs-blue) !important;
+  border-color: var(--bs-blue) !important;
+  color: #fff !important;
+}
+.btn-primary:hover {
+  background-color: #003e7e !important;
+}
+
+/* Nút Cam (Secondary - Dùng cho giá tiền, sale) */
+.btn-secondary {
+  background-color: var(--bs-orange) !important;
+  border-color: var(--bs-orange) !important;
+  color: #fff !important;
+}
+
+/* Nút Xanh Lá (Success - Dùng cho Giỏ hàng) */
+.btn-success {
+  background-color: var(--bs-green) !important;
+  border-color: var(--bs-green) !important;
+  color: #fff !important;
+}
+.btn-success:hover {
+  background-color: #218838 !important;
+}
+
+/* Màu chữ thương hiệu */
+.text-primary {
+  color: var(--bs-blue) !important;
+}
+.text-secondary {
+  color: var(--bs-orange) !important;
+}
+.text-success {
+  color: var(--bs-green) !important;
+}
+
+/* 3. FIX HEADER TRÀN VIỀN */
+.hero-header {
+  margin-top: 0 !important;
+  /* Cách top để không bị Header che mất */
+  padding-top: 140px !important;
+  padding-bottom: 50px !important;
+}
