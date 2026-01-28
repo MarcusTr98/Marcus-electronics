@@ -2,6 +2,7 @@ package com.marcus.electronics.controller;
 
 import com.marcus.electronics.dto.ProductDetailResponseDTO;
 import com.marcus.electronics.dto.ProductListResponseDTO;
+import com.marcus.electronics.model.Product;
 import com.marcus.electronics.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,16 @@ public class ProductController {
             return ResponseEntity.ok(product);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getProductById(@PathVariable Long id) {
+        try {
+            Product product = productService.getProductById(id);
+            return ResponseEntity.ok(product);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

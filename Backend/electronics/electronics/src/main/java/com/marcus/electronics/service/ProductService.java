@@ -85,4 +85,9 @@ public class ProductService {
                                 .skus(skuDTOs)
                                 .build();
         }
+
+        public Product getProductById(long id) {
+                return productRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với ID: " + id));
+        }
 }
