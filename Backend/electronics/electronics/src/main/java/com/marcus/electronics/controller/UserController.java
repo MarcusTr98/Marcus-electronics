@@ -1,6 +1,5 @@
 package com.marcus.electronics.controller;
 
-import com.marcus.electronics.dto.UserLoginDTO;
 import com.marcus.electronics.dto.UserRegisterDTO;
 import com.marcus.electronics.model.User;
 import com.marcus.electronics.service.UserService;
@@ -23,19 +22,6 @@ public class UserController {
         try {
             User newUser = userService.register(registerDTO);
             return ResponseEntity.ok("Đăng ký thành công tài khoản: " + newUser.getUsername());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    // POST /api/v1/auth/login
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid UserLoginDTO loginDTO) {
-        try {
-            User user = userService.login(loginDTO);
-            // Lưu ý: Sau này sẽ trả về Token (JWT) ở đây.
-            // Hiện tại trả về thông báo thành công để test logic.
-            return ResponseEntity.ok("Đăng nhập thành công. Role: " + user.getRole().getName());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

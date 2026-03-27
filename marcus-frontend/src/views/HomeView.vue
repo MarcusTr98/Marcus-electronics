@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, nextTick } from "vue";
 import axios from "axios";
-import ProductCard from "../components/ProductCard.vue"; // Nhớ là ../
+import ProductCard from "../components/ProductCard.vue";
 
 const products = ref([]);
 const loading = ref(true);
