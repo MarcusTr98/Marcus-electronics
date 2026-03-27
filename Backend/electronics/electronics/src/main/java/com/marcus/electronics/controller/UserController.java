@@ -16,14 +16,16 @@ public class UserController {
 
     private final UserService userService;
 
-    // POST /api/v1/auth/register
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Valid UserRegisterDTO registerDTO) {
-        try {
-            User newUser = userService.register(registerDTO);
-            return ResponseEntity.ok("Đăng ký thành công tài khoản: " + newUser.getUsername());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
+    // // POST /api/v1/auth/register
+    // @PostMapping("/register")
+    // public ResponseEntity<?> register(@RequestBody @Valid UserRegisterDTO
+    // registerDTO) {
+    // try {
+    // User newUser = userService.register(registerDTO);
+    // return ResponseEntity.ok("Đăng ký thành công tài khoản: " +
+    // newUser.getUsername());
+    // } catch (Exception e) {
+    // return ResponseEntity.badRequest().body(e.getMessage());
+    // }
+    // }
 }

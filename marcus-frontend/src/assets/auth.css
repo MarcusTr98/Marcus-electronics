@@ -1,0 +1,494 @@
+/*AUTH.CSS — Toàn bộ style cho module Đăng nhập / Đăng ký
+   Dùng cho: AuthPage.vue · LoginForm.vue · RegisterForm.vue */
+
+/* ── Font chung ── */
+.auth-wrapper,
+.login-form,
+.register-form {
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+/*1. AUTH PAGE — Bố cục 2 cột trái / phải*/
+
+.auth-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background: #f0f4f8;
+}
+
+/* ── Panel trái: Branding ── */
+.auth-left {
+  flex: 0 0 400px;
+  background: linear-gradient(160deg, #0054a6 0%, #003d7a 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 40px;
+  color: white;
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  margin-bottom: 8px;
+}
+
+.brand-name {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin: 0;
+  line-height: 1;
+}
+
+.brand-blue {
+  color: #7ec8ff;
+}
+.brand-dark {
+  color: #ffffff;
+}
+
+.brand-tagline {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  margin: 4px 0 48px 48px;
+}
+
+/* Danh sách điểm nổi bật */
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.feature-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.feature-icon svg {
+  stroke: #7ec8ff;
+}
+
+/* ── Panel phải: Form ── */
+.auth-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.auth-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 540px;
+  padding: 32px;
+}
+
+/* Tab Đăng nhập / Đăng ký */
+.tab-switcher {
+  display: flex;
+  background: #f0f4f8;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 28px;
+  gap: 4px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background: white;
+  color: #0054a6;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+}
+
+/*2. FORM CHUNG — Dùng cho cả LoginForm và RegisterForm*/
+
+/* Tiêu đề form */
+.form-header {
+  margin-bottom: 20px;
+}
+.form-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px;
+}
+.form-header p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Nút đăng nhập bằng mạng xã hội */
+.social-btns {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.social-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.social-btn:hover {
+  border-color: #0054a6;
+  background: #f8faff;
+}
+
+/* Đường kẻ "hoặc" */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+/* Thông báo lỗi / thành công */
+.alert-error,
+.alert-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+.alert-success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+}
+
+/* Trường nhập liệu */
+.field {
+  margin-bottom: 14px;
+}
+
+.field label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.field input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  background: white;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.field input:focus {
+  border-color: #0054a6;
+}
+.field input.input-ok {
+  border-color: #22c55e;
+}
+.field input.input-err {
+  border-color: #ef4444;
+}
+
+/* Ô mật khẩu có nút hiện / ẩn */
+.password-wrap {
+  position: relative;
+}
+.password-wrap input {
+  padding-right: 40px;
+}
+
+.toggle-pw {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 0;
+  display: flex;
+}
+
+.toggle-pw:hover {
+  color: #374151;
+}
+
+/* Thanh độ mạnh mật khẩu */
+.strength-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.strength-track {
+  flex: 1;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition:
+    width 0.3s,
+    background 0.3s;
+}
+
+.strength-bar span {
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 42px;
+}
+
+/* Gợi ý mật khẩu khớp / không khớp */
+.match-hint {
+  font-size: 11px;
+  color: #ef4444;
+  margin: 4px 0 0;
+}
+.match-ok {
+  font-size: 11px;
+  color: #22c55e;
+  margin: 4px 0 0;
+}
+
+/* Checkbox (Nhớ tài khoản / Đồng ý điều khoản) */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #374151;
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  accent-color: #0054a6;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+/* Hàng "Nhớ tài khoản" — chỉ LoginForm */
+.remember-row {
+  margin-bottom: 18px;
+}
+
+/* Hàng điều khoản — chỉ RegisterForm */
+.terms-row {
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: #6b7280;
+}
+.terms-row a {
+  color: #0054a6;
+  text-decoration: none;
+  font-weight: 500;
+}
+.terms-row a:hover {
+  text-decoration: underline;
+}
+
+/* Link quên mật khẩu */
+.forgot-link {
+  font-size: 12px;
+  font-weight: 500;
+  color: #0054a6;
+  text-decoration: none;
+}
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+/* Nút submit chính */
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: #0054a6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s;
+  margin-bottom: 16px;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #003d7a;
+}
+.btn-primary:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Spinner loading */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Gợi ý chuyển tab */
+.switch-hint {
+  text-align: center;
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+}
+.switch-hint a {
+  color: #0054a6;
+  font-weight: 600;
+  text-decoration: none;
+}
+.switch-hint a:hover {
+  text-decoration: underline;
+}
+
+/*3. REGISTER — Bố cục 2 cột*/
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* RegisterForm: label không cần space-between */
+.register-form .field label {
+  display: block;
+}
+
+/*4. ANIMATION — Fade cho thông báo*/
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/*5. RESPONSIVE — Màn hình nhỏ (< 768px)*/
+
+@media (max-width: 768px) {
+  .auth-wrapper {
+    flex-direction: column;
+  }
+  .auth-left {
+    flex: 0 0 auto;
+    padding: 24px;
+  }
+  .features {
+    display: none;
+  }
+  .brand-tagline {
+    margin-bottom: 0;
+  }
+  .auth-right {
+    padding: 16px;
+  }
+  .auth-card {
+    padding: 20px;
+  }
+
+  /* Về 1 cột trên mobile */
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+}
