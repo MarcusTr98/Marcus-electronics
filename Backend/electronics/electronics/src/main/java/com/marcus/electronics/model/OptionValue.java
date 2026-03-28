@@ -6,18 +6,18 @@ import lombok.*;
 @Entity
 @Table(name = "optionValue")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class OptionValue {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "option_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "optionId", nullable = false)
     private Option option;
 
-    @Column(name = "value", length = 50, nullable = false)
+    @Column(name = "value", nullable = false)
     private String value;
 }

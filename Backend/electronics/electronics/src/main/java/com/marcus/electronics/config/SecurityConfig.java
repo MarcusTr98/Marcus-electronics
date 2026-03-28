@@ -31,7 +31,7 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    // 1. Bean mã hóa mật khẩu (BCrypt) - Chuẩn an toàn nhất hiện nay
+    // 1.BCrypt
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -43,29 +43,27 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-    // 3. Cấu hình Filter Chain (Luật bảo vệ)
+    // 3. Cấu hình Filter Chain
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // === KHU VỰC PUBLIC (Ai cũng vào được) ===
-                        .requestMatchers("/api/v1/auth/**").permitAll() // Đăng nhập/Đăng ký
-                        .requestMatchers(HttpMethod.GET, "/api/v1/product/**").permitAll() // Xem sản phẩm
-                        .requestMatchers(HttpMethod.POST, "/api/v1/order").permitAll() // Đặt hàng (Guest)
-                        .requestMatchers("/images/**").permitAll() // Xem ảnh
+                        // PUBLIC
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/orders").permitAll()
+                        .requestMatchers("/images/**").permitAll()
 
-                        // === KHU VỰC ADMIN (Cần quyền ADMIN) ===
-                        // .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        // ADMIN
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
-                        // === KHU VỰC CÒN LẠI (Phải đăng nhập) ===
+                        // CÒN LẠI
                         .anyRequest().authenticated())
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Không dùng
-                // Session
-                // cookie
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Thêm filter
-                                                                                                       // JWT vào trước
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -85,4 +83,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 }

@@ -7,6 +7,8 @@ import CheckoutView from "../views/client/CheckoutView.vue";
 import ProductDetail from "../views/client/ProductDetail.vue";
 import LoginView from "../views/auth/LoginView.vue";
 import DashboardView from "../views/admin/DashboardView.vue";
+import ProductManageView from "../views/admin/ProductManageView.vue";
+import CategoryManageView from "../views/admin/CategoryManageView.vue";
 
 const routes = [
   // --- NHÓM TRANG KHÁCH HÀNG (Có Header/Footer) ---
@@ -37,6 +39,25 @@ const routes = [
     path: "/admin",
     component: AdminLayout,
     children: [{ path: "", name: "admin-dashboard", component: DashboardView }],
+  },
+
+  {
+    path: "/admin",
+    component: AdminLayout,
+    children: [
+      { path: "", name: "admin-dashboard", component: DashboardView },
+      // Thêm dòng này:
+      {
+        path: "products",
+        name: "admin-products",
+        component: ProductManageView,
+      },
+      {
+        path: "categories",
+        name: "AdminCategories",
+        component: CategoryManageView,
+      },
+    ],
   },
 ];
 

@@ -5,19 +5,19 @@ import lombok.*;
 
 @Entity
 @Table(name = "category")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Category {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "slug", unique = true, nullable = false)
     private String slug;
 
     @ManyToOne
@@ -25,6 +25,13 @@ public class Category {
     private Category parent;
 
     @Column(name = "isActive")
-    @Builder.Default
-    private Boolean isActive = true;
+    private Boolean isActive;
+
+    public boolean isActive() {
+        return Boolean.TRUE.equals(this.isActive);
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
 }

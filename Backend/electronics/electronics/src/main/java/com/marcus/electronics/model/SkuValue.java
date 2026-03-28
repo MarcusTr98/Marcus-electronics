@@ -6,19 +6,19 @@ import lombok.*;
 @Entity
 @Table(name = "skuValue")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SkuValue {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "sku_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "skuId", nullable = false)
     private Sku sku;
 
-    @ManyToOne
-    @JoinColumn(name = "option_value_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "optionValueId", nullable = false)
     private OptionValue optionValue;
 }

@@ -1,18 +1,22 @@
 package com.marcus.electronics.repository;
 
+import com.marcus.electronics.model.Sku;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.marcus.electronics.model.Sku;
-
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface SkuRepository extends JpaRepository<Sku, Long> {
-    // Tìm SKU theo mã kho (Quan trọng khi quét mã vạch hoặc check đơn)
-    Optional<Sku> findBySkuCode(String skuCode);
 
-    // Lấy danh sách biến thể của 1 sản phẩm
+    // JOIN FETCH skuValues → optionValue → option trong 1 query
+    @Query("""
+                SELECT s FROM Sku s
+                LEFT JOIN FETCH s.skuValues sv
+                LEFT JOIN FETCH sv.optionValue ov
+                LEFT JOIN FETCH ov.option
+                WHERE s.product.id = :productId AND s.isActive = true
+            """)
     List<Sku> findByProductId(Long productId);
 }
