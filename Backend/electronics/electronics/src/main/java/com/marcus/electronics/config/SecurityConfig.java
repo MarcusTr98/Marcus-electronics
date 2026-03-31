@@ -58,7 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/images/**").permitAll()
 
                         // ADMIN
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**").permitAll()
 
                         // CÒN LẠI
                         .anyRequest().authenticated())

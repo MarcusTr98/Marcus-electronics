@@ -12,6 +12,9 @@ public class ProductListResponseDTO {
     private String name;
     private String slug;
     private String thumbnailUrl;
-    private BigDecimal price; // Giá hiển thị (thường là giá thấp nhất)
     private String categoryName;
+    private BigDecimal basePrice;
+    private Boolean active;
+
+    private Integer totalStock;
 }

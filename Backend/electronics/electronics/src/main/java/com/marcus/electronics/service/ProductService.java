@@ -2,6 +2,7 @@ package com.marcus.electronics.service;
 
 import com.marcus.electronics.dto.ProductDetailResponseDTO;
 import com.marcus.electronics.dto.ProductListResponseDTO;
+import com.marcus.electronics.dto.ProductRequestDTO;
 import com.marcus.electronics.model.*;
 import com.marcus.electronics.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class ProductService {
         private final ProductRepository productRepository;
         private final ProductAttributeValueRepository productAttrRepo;
         private final SkuRepository skuRepository;
-        private final OptionRepository optionRepository;
+        private final CategoryRepository categoryRepository;
 
         // ==================== CLIENT ====================
 
@@ -33,16 +34,18 @@ public class ProductService {
                                                 .id(p.getId())
                                                 .name(p.getName())
                                                 .slug(p.getSlug())
-                                                .price(p.getBasePrice())
                                                 .thumbnailUrl(p.getThumbnailUrl())
-                                                .categoryName(p.getCategory().getName())
+                                                .categoryName(p.getCategory() != null ? p.getCategory().getName()
+                                                                : "Chưa phân loại")
+                                                .basePrice(p.getBasePrice())
+                                                .active(p.getIsActive())
                                                 .build())
                                 .collect(Collectors.toList());
         }
 
         @Transactional(readOnly = true)
         public ProductDetailResponseDTO getProductBySlug(String slug) {
-                Product product = productRepository.findBySlugActive(slug)
+                Product product = productRepository.findBySlug(slug)
                                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + slug));
 
                 // Thông số kỹ thuật (EAV)
@@ -93,16 +96,35 @@ public class ProductService {
 
         @Transactional(readOnly = true)
         public List<ProductListResponseDTO> getAllProductsForAdmin() {
-                // Admin thấy cả sản phẩm inactive
-                return productRepository.findAll()
-                                .stream()
+                // 1. Lấy tất cả sản phẩm (1 Query)
+                List<Product> products = productRepository.findAll();
+
+                // 2. Lấy tất cả SKU hiện có trong hệ thống (1 Query)
+                List<Sku> allSkus = skuRepository.findAll();
+
+                // 3. LOGIC SẮC BÉN: Gom nhóm SKU theo ProductID và tính tổng Stock ngay trên
+                // RAM
+                // Kết quả là một cuốn từ điển: Map<ProductId, Tổng tồn kho>
+                Map<Long, Integer> stockMap = allSkus.stream()
+                                .collect(Collectors.groupingBy(
+                                                sku -> sku.getProduct().getId(), // Gom nhóm theo ID sản phẩm
+                                                Collectors.summingInt(
+                                                                sku -> sku.getStock() != null ? sku.getStock() : 0)));
+
+                // 4. Map dữ liệu để trả về cho Frontend
+                return products.stream()
                                 .map(p -> ProductListResponseDTO.builder()
                                                 .id(p.getId())
                                                 .name(p.getName())
                                                 .slug(p.getSlug())
-                                                .price(p.getBasePrice())
                                                 .thumbnailUrl(p.getThumbnailUrl())
-                                                .categoryName(p.getCategory() != null ? p.getCategory().getName() : "")
+                                                .categoryName(p.getCategory() != null ? p.getCategory().getName()
+                                                                : "Chưa phân loại")
+                                                .basePrice(p.getBasePrice())
+                                                .active(p.getIsActive())
+                                                // Lấy tổng tồn kho từ Map ra. Nếu không có (sản phẩm chưa tạo SKU) thì
+                                                // mặc định là 0
+                                                .totalStock(stockMap.getOrDefault(p.getId(), 0))
                                                 .build())
                                 .collect(Collectors.toList());
         }
@@ -111,5 +133,74 @@ public class ProductService {
         public Product getProductById(long id) {
                 return productRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với ID: " + id));
+        }
+
+        @Transactional
+        public void createProduct(ProductRequestDTO dto) {
+                // 1. Kiểm tra Category có tồn tại không
+                Category category = categoryRepository.findById(dto.getCategoryId())
+                                .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại"));
+
+                // 2. Map dữ liệu từ DTO sang Entity
+                Product product = Product.builder()
+                                .name(dto.getName())
+                                .slug(dto.getSlug())
+                                .description(dto.getDescription())
+                                .category(category)
+                                .thumbnailUrl(dto.getThumbnailUrl())
+                                .basePrice(dto.getBasePrice())
+                                .weightG(dto.getWeightG())
+                                .lengthCm(dto.getLengthCm())
+                                .widthCm(dto.getWidthCm())
+                                .heightCm(dto.getHeightCm())
+                                .isActive(dto.getActive() != null ? dto.getActive() : true)
+                                .build();
+
+                productRepository.save(product);
+        }
+
+        @Transactional
+        public void updateProduct(Long id, ProductRequestDTO dto) {
+                Product product = productRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
+
+                Category category = categoryRepository.findById(dto.getCategoryId())
+                                .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại"));
+
+                // Cập nhật thông tin
+                product.setName(dto.getName());
+                product.setSlug(dto.getSlug());
+                product.setDescription(dto.getDescription());
+                product.setCategory(category);
+                product.setThumbnailUrl(dto.getThumbnailUrl());
+                product.setBasePrice(dto.getBasePrice());
+                product.setWeightG(dto.getWeightG());
+                product.setLengthCm(dto.getLengthCm());
+                product.setWidthCm(dto.getWidthCm());
+                product.setHeightCm(dto.getHeightCm());
+
+                if (dto.getActive() != null) {
+                        product.setIsActive(dto.getActive());
+                }
+
+                productRepository.save(product);
+        }
+
+        @Transactional
+        public void deleteProduct(Long id) {
+                Product product = productRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
+                // Soft Delete
+                product.setIsActive(false);
+                productRepository.save(product);
+        }
+
+        @Transactional
+        public void restoreProduct(Long id) {
+                Product product = productRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
+                // Khôi phục
+                product.setIsActive(true);
+                productRepository.save(product);
         }
 }

@@ -38,7 +38,6 @@ public class Product {
     @Column(name = "basePrice")
     private BigDecimal basePrice;
 
-    // Ship info - Giống hệt SQL
     @Column(name = "weightG")
     private Integer weightG;
     @Column(name = "lengthCm")

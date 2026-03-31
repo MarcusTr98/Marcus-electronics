@@ -23,77 +23,128 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th>Sản phẩm</th>
+              <th>STT</th>
+              <th>Sản phẩm (Catalog)</th>
               <th>Danh mục</th>
               <th>Giá cơ bản</th>
-              <th>Trạng thái</th>
+              <th>Tổng tồn kho (Từ SKU)</th>
+              <th>Trạng thái hiển thị</th>
               <th>Hành động</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-if="isLoading">
-              <td colspan="5" class="text-center py-4">Đang tải dữ liệu...</td>
-            </tr>
-            <tr v-else-if="allProducts.length === 0">
-              <td colspan="5" class="text-center py-4">
-                Chưa có sản phẩm nào.
-              </td>
-            </tr>
-            <tr v-for="product in allProducts" :key="product.id" v-else>
-              <td>
-                <div class="product-cell">
-                  <div class="product-thumb">
-                    <img
-                      :src="
-                        product.thumbnailUrl || 'https://via.placeholder.com/40'
-                      "
-                      alt="thumb"
-                      style="
-                        width: 100%;
-                        height: 100%;
-                        object-fit: cover;
-                        border-radius: 8px;
-                      "
-                    />
+            <template v-if="isLoading">
+              <tr>
+                <td colspan="7" class="text-center py-4">
+                  Đang tải dữ liệu...
+                </td>
+              </tr>
+            </template>
+
+            <template v-else-if="allProducts.length === 0">
+              <tr>
+                <td colspan="7" class="text-center py-4">
+                  Chưa có sản phẩm nào.
+                </td>
+              </tr>
+            </template>
+
+            <template v-else>
+              <tr v-for="(product, index) in allProducts" :key="product.id">
+                <td class="text-center">
+                  {{ (currentPage - 1) * pageSize + index + 1 }}
+                </td>
+
+                <td>
+                  <div class="product-cell d-flex align-items-center">
+                    <div
+                      class="product-thumb me-2"
+                      style="width: 45px; height: 45px"
+                    >
+                      <img
+                        :src="
+                          product.thumbnailUrl ||
+                          'https://via.placeholder.com/45'
+                        "
+                        alt="thumb"
+                        style="
+                          width: 100%;
+                          height: 100%;
+                          object-fit: cover;
+                          border-radius: 6px;
+                        "
+                      />
+                    </div>
+                    <div>
+                      <div class="product-name fw-bold">{{ product.name }}</div>
+                      <div
+                        class="product-sku text-muted"
+                        style="font-size: 0.85rem"
+                      >
+                        Slug: {{ product.slug }}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div class="product-name">{{ product.name }}</div>
-                    <div class="product-sku">Slug: {{ product.slug }}</div>
+                </td>
+
+                <td>
+                  <span class="category-tag bg-light text-dark border">{{
+                    product.categoryName
+                  }}</span>
+                </td>
+
+                <td class="price-cell text-danger fw-bold">
+                  {{
+                    product.basePrice
+                      ? formatCurrency(product.basePrice)
+                      : "0 ₫"
+                  }}
+                </td>
+
+                <td class="text-center fw-bold">
+                  <span
+                    v-if="product?.totalStock && product.totalStock > 0"
+                    class="text-success"
+                  >
+                    {{ product.totalStock }} pcs
+                  </span>
+                  <span v-else class="text-danger">Chưa nhập kho</span>
+                </td>
+
+                <td class="text-center fw-bold">
+                  <span v-if="product.active" class="text-success"
+                    >Hoạt động</span
+                  >
+                  <span v-else class="text-muted">Tạm ẩn</span>
+                </td>
+
+                <td>
+                  <div class="action-btns d-flex gap-2">
+                    <button
+                      class="btn btn-sm btn-outline-primary"
+                      @click="editProduct(product)"
+                      title="Sửa thông tin Marketing"
+                    >
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-outline-success"
+                      @click="manageSKU(product.id)"
+                      title="Quản lý Kho & Biến thể (SKU)"
+                    >
+                      <i class="bi bi-box-seam"></i>
+                    </button>
+                    <button
+                      class="btn btn-sm btn-outline-danger"
+                      @click="confirmDelete(product.id)"
+                      title="Xóa Catalog"
+                    >
+                      <i class="bi bi-trash"></i>
+                    </button>
                   </div>
-                </div>
-              </td>
-              <td>
-                <span class="category-tag">{{ product.categoryName }}</span>
-              </td>
-              <td class="price-cell">{{ formatCurrency(product.price) }}</td>
-              <td>
-                <span class="status-pill active">Hoạt động</span>
-              </td>
-              <td>
-                <div class="action-btns">
-                  <button
-                    class="action-btn edit"
-                    @click="editProduct(product)"
-                    title="Sửa thông tin gốc"
-                  >
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button
-                    class="action-btn view"
-                    title="Quản lý biến thể (SKU)"
-                  >
-                    <i class="bi bi-box-seam"></i>
-                  </button>
-                  <button
-                    class="action-btn delete"
-                    @click="confirmDelete(product.id)"
-                    title="Xóa"
-                  >
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -101,28 +152,20 @@
 
     <div class="modal-overlay" v-if="showModal" @click.self="showModal = false">
       <div class="modal-box">
-        <div class="modal-header-custom">
-          <h5>
-            {{ editingId ? "Sửa sản phẩm gốc" : "Thêm sản phẩm gốc mới" }}
-          </h5>
-          <button class="modal-close" @click="showModal = false">
-            <i class="bi bi-x-lg"></i>
-          </button>
-        </div>
-
         <div class="modal-body-custom">
           <div class="form-row-2">
             <div class="form-group-custom">
-              <label>Tên sản phẩm *</label>
+              <label>Tên sản phẩm (Catalog) *</label>
               <input
                 v-model="form.name"
+                @input="generateSlug"
                 type="text"
                 placeholder="Ví dụ: iPhone 15 Pro Max"
               />
             </div>
             <div class="form-group-custom">
               <label>Danh mục *</label>
-              <select v-model="form.category_id">
+              <select v-model="form.categoryId">
                 <option v-for="cat in categories" :key="cat.id" :value="cat.id">
                   {{ cat.name }}
                 </option>
@@ -132,13 +175,38 @@
 
           <div class="form-row-2">
             <div class="form-group-custom">
+              <label>Đường dẫn (Slug) *</label>
+              <input
+                v-model="form.slug"
+                type="text"
+                placeholder="iphone-15-pro-max"
+              />
+            </div>
+            <div class="form-group-custom">
+              <label>Trạng thái hiển thị</label>
+              <div class="form-check form-switch mt-2">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  v-model="form.active"
+                  id="activeProduct"
+                />
+                <label class="form-check-label" for="activeProduct"
+                  >Đang bán trên web</label
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group-custom">
               <label>Giá cơ bản (VNĐ) *</label>
-              <input v-model="form.base_price" type="number" placeholder="0" />
+              <input v-model="form.basePrice" type="number" placeholder="0" />
             </div>
             <div class="form-group-custom">
               <label>URL Ảnh đại diện</label>
               <input
-                v-model="form.thumbnail_url"
+                v-model="form.thumbnailUrl"
                 type="text"
                 placeholder="https://..."
               />
@@ -178,15 +246,14 @@
           </div>
 
           <div class="form-group-custom mt-2">
-            <label>Mô tả chi tiết</label>
+            <label>Mô tả chi tiết Marketing</label>
             <textarea
               v-model="form.description"
               rows="4"
-              placeholder="Nhập mô tả sản phẩm..."
+              placeholder="Nhập bài viết mô tả sản phẩm..."
             ></textarea>
           </div>
         </div>
-
         <div class="modal-footer-custom">
           <button class="btn-cancel" @click="showModal = false">Hủy</button>
           <button class="btn-save" @click="saveProduct">
@@ -202,7 +269,7 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 
-const API_PRODUCT_URL = "http://localhost:8080/api/v1/products";
+const API_PRODUCT_URL = "http://localhost:8080/api/v1/admin/products";
 const API_CATEGORY_URL = "http://localhost:8080/api/v1/categories";
 
 const allProducts = ref([]);
@@ -211,17 +278,35 @@ const isLoading = ref(false);
 const showModal = ref(false);
 const editingId = ref(null);
 
+const currentPage = 1;
+const pageSize = 5;
+
 const form = ref({
   name: "",
+  slug: "",
   description: "",
-  category_id: null, // Mặc định là null
-  thumbnail_url: "",
-  base_price: 0,
+  categoryId: null, // Sửa category_id thành categoryId
+  thumbnailUrl: "", // Sửa thumbnail_url
+  basePrice: 0, // Sửa base_price
   weightG: 0,
   lengthCm: 0,
   widthCm: 0,
   heightCm: 0,
+  active: true, // THÊM: Trạng thái hiển thị
 });
+
+// Hàm tạo slug tự động
+const generateSlug = () => {
+  if (!form.value.name) return;
+  form.value.slug = form.value.name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+};
 
 // Lấy danh sách Sản phẩm
 const fetchProducts = async () => {
@@ -236,13 +321,10 @@ const fetchProducts = async () => {
   }
 };
 
-// Lấy danh sách Danh mục để đổ vào thẻ <select>
 const fetchCategories = async () => {
   try {
     const response = await axios.get(API_CATEGORY_URL);
     categories.value = response.data;
-
-    // Tự động chọn danh mục đầu tiên nếu form đang trống
     if (categories.value.length > 0 && !form.value.category_id) {
       form.value.category_id = categories.value[0].id;
     }
@@ -333,7 +415,6 @@ const formatCurrency = (val) => {
   }).format(val);
 };
 
-// Gọi CẢ HAI API khi load trang
 onMounted(() => {
   fetchCategories();
   fetchProducts();

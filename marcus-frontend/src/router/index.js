@@ -46,7 +46,6 @@ const routes = [
     component: AdminLayout,
     children: [
       { path: "", name: "admin-dashboard", component: DashboardView },
-      // Thêm dòng này:
       {
         path: "products",
         name: "admin-products",

@@ -1,5 +1,7 @@
 package com.marcus.electronics.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,13 +27,14 @@ public class Category {
     private Category parent;
 
     @Column(name = "isActive")
+    @JsonProperty("isActive")
     private Boolean isActive;
 
-    public boolean isActive() {
-        return Boolean.TRUE.equals(this.isActive);
-    }
+    // public boolean isActive() {
+    // return Boolean.TRUE.equals(this.isActive);
+    // }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
+    // public void setIsActive(Boolean isActive) {
+    // this.isActive = isActive;
+    // }
 }

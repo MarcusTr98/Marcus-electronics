@@ -12,8 +12,7 @@ const quantity = ref(1);
 const getProductDetail = async () => {
   try {
     const id = route.params.id;
-    // Gọi API lấy tất cả rồi lọc (như cũ)
-    const response = await axios.get("http://localhost:8080/api/v1/product");
+    const response = await axios.get("http://localhost:8080/api/v1/products");
     product.value = response.data.find((p) => p.id == id);
   } catch (error) {
     console.error("Lỗi:", error);
@@ -26,27 +25,21 @@ const getProductDetail = async () => {
 const addToCart = () => {
   if (!product.value) return;
 
-  // Lấy giỏ hàng cũ từ LocalStorage (nếu có)
   let cart = JSON.parse(localStorage.getItem("marcus_cart")) || [];
 
-  // Kiểm tra xem sản phẩm này đã có trong giỏ chưa
   const existingItem = cart.find((item) => item.id === product.value.id);
 
   if (existingItem) {
-    // Nếu có rồi thì cộng thêm số lượng
     existingItem.quantity += quantity.value;
   } else {
-    // Nếu chưa có thì thêm mới
     cart.push({
       id: product.value.id,
       name: product.value.name,
-      price: product.value.price,
+      price: product.value.basePrice,
       thumbnail: product.value.thumbnailUrl || "/img/product-1.png",
       quantity: quantity.value,
     });
   }
-
-  // Lưu ngược lại vào LocalStorage
   localStorage.setItem("marcus_cart", JSON.stringify(cart));
   window.dispatchEvent(new Event("cart-updated"));
   alert("Đã thêm " + quantity.value + " sản phẩm vào giỏ!");

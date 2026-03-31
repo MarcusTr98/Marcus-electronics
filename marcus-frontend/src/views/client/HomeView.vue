@@ -8,7 +8,7 @@ const loading = ref(true);
 
 const getProducts = async () => {
   try {
-    const response = await axios.get("http://localhost:8080/api/v1/product");
+    const response = await axios.get("http://localhost:8080/api/v1/products");
     products.value = response.data;
   } catch (error) {
     console.error("Lỗi:", error);

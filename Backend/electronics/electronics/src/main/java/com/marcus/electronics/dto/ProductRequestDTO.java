@@ -15,14 +15,11 @@ public class ProductRequestDTO {
 
     private String description;
 
-    @JsonProperty("category_id")
     @NotNull(message = "Phải chọn danh mục")
     private Integer categoryId;
 
-    @JsonProperty("thumbnail_url")
     private String thumbnailUrl;
 
-    @JsonProperty("base_price")
     @Min(value = 0, message = "Giá không được âm")
     private BigDecimal basePrice;
 
@@ -31,4 +28,9 @@ public class ProductRequestDTO {
     private Integer lengthCm;
     private Integer widthCm;
     private Integer heightCm;
+
+    @NotBlank(message = "Đường dẫn không được trống")
+    private String slug;
+
+    private Boolean active;
 }

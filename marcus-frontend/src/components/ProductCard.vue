@@ -20,7 +20,7 @@ const addToCart = (product) => {
     cart.push({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: product.value.basePrice,
       thumbnail: product.thumbnailUrl || "/img/product-1.png",
       quantity: 1,
     });
@@ -84,7 +84,7 @@ const addToCart = (product) => {
             </router-link>
           </div>
           <div class="fw-bold fs-5 text-secondary">
-            {{ Number(product.price).toLocaleString("vi-VN") }} ₫
+            {{ Number(product.basePrice).toLocaleString("vi-VN") }} ₫
           </div>
         </div>
 
