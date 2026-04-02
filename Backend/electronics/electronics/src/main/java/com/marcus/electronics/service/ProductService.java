@@ -23,6 +23,7 @@ public class ProductService {
         private final ProductAttributeValueRepository productAttrRepo;
         private final SkuRepository skuRepository;
         private final CategoryRepository categoryRepository;
+        private final OptionValueRepository optionValueRepository1;
 
         // ==================== CLIENT ====================
 
@@ -96,22 +97,33 @@ public class ProductService {
 
         @Transactional(readOnly = true)
         public List<ProductListResponseDTO> getAllProductsForAdmin() {
-                // 1. Lấy tất cả sản phẩm (1 Query)
                 List<Product> products = productRepository.findAll();
-
-                // 2. Lấy tất cả SKU hiện có trong hệ thống (1 Query)
                 List<Sku> allSkus = skuRepository.findAll();
 
-                // 3. LOGIC SẮC BÉN: Gom nhóm SKU theo ProductID và tính tổng Stock ngay trên
-                // RAM
-                // Kết quả là một cuốn từ điển: Map<ProductId, Tổng tồn kho>
+                // 1. Map Tồn kho tổng
                 Map<Long, Integer> stockMap = allSkus.stream()
                                 .collect(Collectors.groupingBy(
-                                                sku -> sku.getProduct().getId(), // Gom nhóm theo ID sản phẩm
+                                                sku -> sku.getProduct().getId(),
                                                 Collectors.summingInt(
                                                                 sku -> sku.getStock() != null ? sku.getStock() : 0)));
 
-                // 4. Map dữ liệu để trả về cho Frontend
+                // 2. Lấy toàn bộ OptionValue (Cần viết @Query "SELECT ov FROM OptionValue ov
+                // JOIN FETCH ov.option" để tối ưu)
+                List<OptionValue> allOptionValues = optionValueRepository1.findAll();
+
+                // 3. LOGIC SẮC BÉN: Gom nhóm đa tầng -> Map<ProductID, Map<Tên_Thuộc_Tính,
+                // Số_Lượng_Giá_Trị>>
+                Map<Long, Map<String, Long>> variantSummaryMap = allOptionValues.stream()
+                                .collect(Collectors.groupingBy(
+                                                ov -> ov.getOption().getProduct().getId(), // Nhóm 1: Theo ID Sản phẩm
+                                                Collectors.groupingBy(
+                                                                ov -> ov.getOption().getName(), // Nhóm 2: Theo Tên
+                                                                                                // Thuộc tính (Màu sắc)
+                                                                Collectors.counting() // Đếm số lượng giá trị (Đỏ,
+                                                                                      // Xanh...)
+                                                )));
+
+                // 4. Map vào DTO
                 return products.stream()
                                 .map(p -> ProductListResponseDTO.builder()
                                                 .id(p.getId())
@@ -122,9 +134,10 @@ public class ProductService {
                                                                 : "Chưa phân loại")
                                                 .basePrice(p.getBasePrice())
                                                 .active(p.getIsActive())
-                                                // Lấy tổng tồn kho từ Map ra. Nếu không có (sản phẩm chưa tạo SKU) thì
-                                                // mặc định là 0
                                                 .totalStock(stockMap.getOrDefault(p.getId(), 0))
+                                                // Gắn Map Summary vào đây
+                                                .variantSummary(variantSummaryMap.getOrDefault(p.getId(),
+                                                                new java.util.HashMap<>()))
                                                 .build())
                                 .collect(Collectors.toList());
         }

@@ -3,14 +3,14 @@ import { ref, onMounted } from "vue";
 import api from "../../utils/api";
 import ProductModal from "./ProductModal.vue";
 
+// ==================== STATE ====================
 const allProducts = ref([]);
 const categories = ref([]);
 const isLoading = ref(false);
-
 const isShowModal = ref(false);
 const editingProduct = ref(null);
 
-// Lấy danh sách sản phẩm
+// ==================== API CALLS ====================
 const fetchProducts = async () => {
   isLoading.value = true;
   try {
@@ -24,7 +24,6 @@ const fetchProducts = async () => {
   }
 };
 
-// Lấy danh mục
 const fetchCategories = async () => {
   try {
     const res = await api.get("/categories");
@@ -34,23 +33,21 @@ const fetchCategories = async () => {
   }
 };
 
+// ==================== MODAL ====================
 const openAddModal = () => {
   editingProduct.value = null;
   isShowModal.value = true;
 };
 
-// SỬA SẢN PHẨM
+// ==================== CRUD ====================
 const editProduct = async (productRow) => {
   try {
-    // Gọi API lấy chi tiết
     const res = await api.get(`/admin/products/${productRow.id}`);
-
-    // Đổ dữ liệu vào editingProduct để truyền xuống Modal
     editingProduct.value = {
       id: res.data.id,
       name: res.data.name,
       slug: res.data.slug,
-      categoryId: res.data.category?.id || null,
+      categoryId: res.data.category?.id ?? null,
       basePrice: res.data.basePrice,
       thumbnailUrl: res.data.thumbnailUrl,
       weightG: res.data.weightG,
@@ -67,7 +64,6 @@ const editProduct = async (productRow) => {
   }
 };
 
-// LƯU SẢN PHẨM (Thêm mới hoặc Cập nhật)
 const handleSave = async (productData) => {
   try {
     if (editingProduct.value) {
@@ -76,42 +72,40 @@ const handleSave = async (productData) => {
       await api.post("/admin/products", productData);
     }
     isShowModal.value = false;
-    fetchProducts(); // Tải lại danh sách
+    fetchProducts();
     alert("Thao tác thành công!");
   } catch (err) {
     alert("Lỗi: " + (err.response?.data?.message || err.message));
   }
 };
 
-// XÓA MỀM (Khớp với DELETE /api/admin/products/{id} trong Java)
 const confirmDelete = async (id) => {
   if (!confirm("Bạn có chắc chắn muốn xóa mềm sản phẩm này?")) return;
   try {
     await api.delete(`/admin/products/${id}`);
-    // Cập nhật state trực tiếp để UI phản hồi ngay, không cần fetch lại toàn bộ
-    const targetProduct = allProducts.value.find((p) => p.id === id);
-    if (targetProduct) targetProduct.active = false;
+    const target = allProducts.value.find((p) => p.id === id);
+    if (target) target.active = false;
   } catch (error) {
     alert("Lỗi khi xóa sản phẩm!");
   }
 };
 
-// KHÔI PHỤC (Khớp với PUT /api/admin/products/{id}/restore trong Java)
 const handleRestore = async (id) => {
   if (!confirm("Khôi phục lại sản phẩm này?")) return;
   try {
     await api.put(`/admin/products/${id}/restore`);
-    // Cập nhật state
-    const targetProduct = allProducts.value.find((p) => p.id === id);
-    if (targetProduct) targetProduct.active = true;
+    const target = allProducts.value.find((p) => p.id === id);
+    if (target) target.active = true;
   } catch (error) {
     alert("Lỗi khi khôi phục sản phẩm!");
   }
 };
 
+// ==================== UTILS ====================
 const formatCurrency = (val) =>
   new Intl.NumberFormat("vi-VN").format(val || 0) + " ₫";
 
+// ==================== LIFECYCLE ====================
 onMounted(() => {
   fetchCategories();
   fetchProducts();
@@ -137,6 +131,7 @@ onMounted(() => {
               <th>STT</th>
               <th>Sản phẩm</th>
               <th>Danh mục</th>
+              <th>Biến thể</th>
               <th>Giá cơ bản</th>
               <th>Tổng tồn kho</th>
               <th>Trạng thái</th>
@@ -149,7 +144,7 @@ onMounted(() => {
               <td>
                 <div class="d-flex align-items-center">
                   <img
-                    :src="p.thumbnailUrl || 'https://via.placeholder.com/40'"
+                    :src="p.thumbnailUrl || 'https://placehold.co/400x400'"
                     class="me-2 rounded"
                     style="width: 40px; height: 40px; object-fit: cover"
                   />
@@ -157,6 +152,23 @@ onMounted(() => {
                 </div>
               </td>
               <td>{{ p.categoryName }}</td>
+              <td>
+                <template
+                  v-if="
+                    p.variantSummary && Object.keys(p.variantSummary).length
+                  "
+                >
+                  <span
+                    v-for="(count, name) in p.variantSummary"
+                    :key="name"
+                    class="badge bg-info text-dark me-1"
+                    style="font-size: 0.7rem"
+                  >
+                    {{ name }}: {{ count }}
+                  </span>
+                </template>
+                <span v-else class="text-muted small">Chưa có SKU</span>
+              </td>
               <td class="text-danger fw-bold">
                 {{ formatCurrency(p.basePrice) }}
               </td>
@@ -169,29 +181,37 @@ onMounted(() => {
               <td>
                 <button
                   class="btn btn-sm btn-outline-primary me-2"
-                  @click="editProduct(p)"
                   title="Chỉnh sửa"
+                  @click="editProduct(p)"
                 >
                   <i class="bi bi-pencil"></i>
                 </button>
 
                 <button
                   v-if="p.active"
-                  class="btn btn-sm btn-outline-danger"
-                  @click="confirmDelete(p.id)"
+                  class="btn btn-sm btn-outline-danger me-2"
                   title="Xóa mềm"
+                  @click="confirmDelete(p.id)"
                 >
                   <i class="bi bi-trash"></i>
                 </button>
 
                 <button
                   v-else
-                  class="btn btn-sm btn-outline-success"
-                  @click="handleRestore(p.id)"
+                  class="btn btn-sm btn-outline-success me-2"
                   title="Khôi phục sản phẩm"
+                  @click="handleRestore(p.id)"
                 >
                   <i class="bi bi-arrow-counterclockwise"></i>
                 </button>
+
+                <router-link
+                  :to="`/admin/products/${p.id}/variants`"
+                  class="btn btn-sm btn-outline-info"
+                  title="Xem chi tiết SKU"
+                >
+                  <i class="bi bi-eye"></i>
+                </router-link>
               </td>
             </tr>
           </tbody>

@@ -112,7 +112,7 @@ const submit = () => {
             <label class="d-block mb-2 fw-bold">Ảnh đại diện</label>
             <div class="img-preview mb-2 mx-auto">
               <img
-                :src="form.thumbnailUrl || 'https://via.placeholder.com/150'"
+                :src="form.thumbnailUrl || 'https://placehold.co/400x400'"
                 class="img-thumbnail"
                 style="height: 150px; object-fit: cover"
               />
@@ -221,14 +221,14 @@ const submit = () => {
 .modal-body-custom label {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #111827; /* Đen đậm thay vì xám nhạt */
+  color: #111827;
   margin-bottom: 6px;
 }
 
 /* Ép màu và viền cho các input/select/textarea của Bootstrap */
 .modal-body-custom .form-control,
 .modal-body-custom .form-select {
-  color: #000000; /* Text màu đen tuyền */
+  color: #000000;
   font-weight: 500;
   border: 1px solid #cbd5e1;
   background-color: #f8fafc;

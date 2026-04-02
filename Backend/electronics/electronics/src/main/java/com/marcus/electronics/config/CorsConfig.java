@@ -1,40 +1,36 @@
-package com.marcus.electronics.config;
+// package com.marcus.electronics.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
+// import org.springframework.web.cors.CorsConfiguration;
+// import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+// import org.springframework.web.filter.CorsFilter;
 
-@Configuration
-public class CorsConfig {
+// @Configuration
+// public class CorsConfig {
 
-    @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
+// @Bean
+// public CorsFilter corsFilter() {
+// CorsConfiguration config = new CorsConfiguration();
 
-        // Cho phép frontend Vue (dev) gọi vào — đổi thành domain thật khi lên
-        // production
-        config.addAllowedOrigin("http://localhost:5173"); // Vite dev server
-        config.addAllowedOrigin("http://localhost:3000"); // Dự phòng nếu dùng port khác
+// // 1. Chỉ định chính xác Domain được phép (Bắt buộc khi có Credentials)
+// config.addAllowedOrigin("http://localhost:5173");
+// config.addAllowedOrigin("http://localhost:3000");
 
-        // Cho phép tất cả HTTP method mà CRUD cần
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("DELETE");
-        config.addAllowedMethod("OPTIONS"); // Bắt buộc phải có — browser gửi preflight request trước
+// // 2. Cho phép TẤT CẢ các HTTP Method (GET, POST, PUT, PATCH, DELETE,
+// // OPTIONS...)
+// config.addAllowedMethod("*");
 
-        // Cho phép header Authorization (JWT) và Content-Type
-        config.addAllowedHeader("Authorization");
-        config.addAllowedHeader("Content-Type");
+// // 3. Cho phép TẤT CẢ các Header
+// config.addAllowedHeader("*");
 
-        // Cho phép gửi cookie / token trong request (cần cho JWT)
-        config.setAllowCredentials(true);
+// // 4. Cho phép gửi Cookie/Token
+// config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", config); // Áp dụng cho toàn bộ /api/
+// UrlBasedCorsConfigurationSource source = new
+// UrlBasedCorsConfigurationSource();
+// source.registerCorsConfiguration("/**", config);
 
-        return new CorsFilter(source);
-    }
-}
+// return new CorsFilter(source);
+// }
+// }

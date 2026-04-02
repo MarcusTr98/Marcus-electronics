@@ -1,14 +1,21 @@
 import { createRouter, createWebHistory } from "vue-router";
 import ClientLayout from "../layouts/ClientLayout.vue";
 import AdminLayout from "../layouts/AdminLayout.vue";
+
+// Khách hàng
 import HomeView from "../views/client/HomeView.vue";
 import CartView from "../views/client/CartView.vue";
 import CheckoutView from "../views/client/CheckoutView.vue";
 import ProductDetail from "../views/client/ProductDetail.vue";
 import LoginView from "../views/auth/LoginView.vue";
+
+// Quản trị viên
 import DashboardView from "../views/admin/DashboardView.vue";
 import ProductManageView from "../views/admin/ProductManageView.vue";
 import CategoryManageView from "../views/admin/CategoryManageView.vue";
+import ProductVariants from "../views/admin/ProductVariants.vue";
+import InventoryManager from "../views/admin/InventoryManager.vue";
+import ProductVariantDetail from "../views/admin/ProductVariantDetail.vue";
 
 const routes = [
   // --- NHÓM TRANG KHÁCH HÀNG (Có Header/Footer) ---
@@ -34,18 +41,16 @@ const routes = [
     component: LoginView,
   },
 
-  // --- NHÓM TRANG ADMIN (Có Sidebar/Dashboard) ---
-  {
-    path: "/admin",
-    component: AdminLayout,
-    children: [{ path: "", name: "admin-dashboard", component: DashboardView }],
-  },
-
+  // --- NHÓM TRANG ADMIN
   {
     path: "/admin",
     component: AdminLayout,
     children: [
-      { path: "", name: "admin-dashboard", component: DashboardView },
+      {
+        path: "",
+        name: "admin-dashboard",
+        component: DashboardView,
+      },
       {
         path: "products",
         name: "admin-products",
@@ -56,6 +61,21 @@ const routes = [
         name: "AdminCategories",
         component: CategoryManageView,
       },
+      {
+        path: "products/variants",
+        name: "admin-products-variants",
+        component: ProductVariants,
+      },
+      {
+        path: "products/:id/variants",
+        name: "admin-product-variant-detail",
+        component: ProductVariantDetail,
+      },
+      {
+        path: "products/inventory",
+        name: "admin-products-inventory",
+        component: InventoryManager,
+      },
     ],
   },
 ];
@@ -65,25 +85,22 @@ const router = createRouter({
   routes,
 });
 
-//NAVIGATION GUARD
+// NAVIGATION GUARD
 router.beforeEach((to, from, next) => {
-  // Lấy thông tin từ LocalStorage
   const token = localStorage.getItem("jwt_token");
   const role = localStorage.getItem("user_role") || "";
 
-  // Nếu người dùng cố tình truy cập vào bất kỳ route nào bắt đầu bằng '/admin'
   if (to.path.startsWith("/admin")) {
     if (!token) {
       alert("Truy cập bị từ chối: Bạn chưa đăng nhập!");
-      next("/login"); // Trục xuất về trang Login
+      next("/login");
     } else if (!role.includes("ADMIN")) {
       alert("Truy cập bị từ chối: Bạn không có quyền Quản trị viên!");
-      next("/"); // Trục xuất về trang chủ
+      next("/");
     } else {
-      next(); // Hợp lệ, cho phép đi tiếp
+      next();
     }
   } else {
-    // Các trang không phải admin thì ai cũng được vào
     next();
   }
 });
