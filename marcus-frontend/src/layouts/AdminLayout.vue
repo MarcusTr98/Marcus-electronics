@@ -128,33 +128,14 @@ const handleLogout = () => {
               </router-link>
             </li>
 
-            <!-- Đơn hàng (có submenu) -->
-            <li class="sidebar-item has-sub" :class="{ open: ordersOpen }">
-              <a
-                href="#"
-                class="sidebar-link"
-                @click.prevent="ordersOpen = !ordersOpen"
-              >
+            <li
+              class="sidebar-item"
+              :class="{ active: $route.path === '/admin/orders' }"
+            >
+              <router-link to="/admin/orders" class="sidebar-link">
                 <i class="bi bi-cart-fill"></i>
                 <span>Đơn hàng</span>
-              </a>
-              <ul class="submenu" :class="{ open: ordersOpen }">
-                <li class="submenu-item">
-                  <router-link to="/admin/orders">
-                    <i class="bi bi-circle-fill"></i> Tất cả đơn
-                  </router-link>
-                </li>
-                <li class="submenu-item">
-                  <router-link to="/admin/orders/pending">
-                    <i class="bi bi-circle-fill"></i> Chờ xử lý
-                  </router-link>
-                </li>
-                <li class="submenu-item">
-                  <router-link to="/admin/orders/completed">
-                    <i class="bi bi-circle-fill"></i> Đã hoàn thành
-                  </router-link>
-                </li>
-              </ul>
+              </router-link>
             </li>
 
             <!-- Nội dung & Phân tích -->

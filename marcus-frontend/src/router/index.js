@@ -16,6 +16,8 @@ import CategoryManageView from "../views/admin/CategoryManageView.vue";
 import ProductVariants from "../views/admin/ProductVariants.vue";
 import InventoryManager from "../views/admin/InventoryManager.vue";
 import ProductVariantDetail from "../views/admin/ProductVariantDetail.vue";
+import CustomerManageView from "../views/admin/CustomerManageView.vue";
+import OrderManageView from "../views/admin/OrderManageView.vue";
 
 const routes = [
   // --- NHÓM TRANG KHÁCH HÀNG (Có Header/Footer) ---
@@ -75,6 +77,16 @@ const routes = [
         path: "products/inventory",
         name: "admin-products-inventory",
         component: InventoryManager,
+      },
+      {
+        path: "customers",
+        name: "admin-customers",
+        component: CustomerManageView,
+      },
+      {
+        path: "orders",
+        name: "admin-orders",
+        component: OrderManageView,
       },
     ],
   },
