@@ -2,6 +2,7 @@ package com.marcus.electronics.controller;
 
 import com.marcus.electronics.dto.ProductListResponseDTO;
 import com.marcus.electronics.dto.ProductRequestDTO;
+import com.marcus.electronics.model.Product;
 import com.marcus.electronics.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,4 +49,10 @@ public class AdminProductController {
         productService.restoreProduct(id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getProductById(id));
+    }
+
 }

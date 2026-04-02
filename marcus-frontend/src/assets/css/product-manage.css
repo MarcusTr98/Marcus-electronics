@@ -712,12 +712,11 @@
 
 .form-group-custom label {
   font-size: 0.78rem;
-  font-weight: 600;
-  color: #64748b;
+  font-weight: 700; /* Tăng độ đậm từ 600 lên 700 */
+  color: #0f172a; /* Đổi từ xám nhạt sang xám đen rất đậm */
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
-
 .form-group-custom input,
 .form-group-custom select,
 .form-group-custom textarea {
@@ -725,7 +724,8 @@
   border-radius: 10px;
   padding: 9px 12px;
   font-size: 0.875rem;
-  color: #1e293b;
+  color: #000000; /* Đổi từ #1e293b sang đen tuyệt đối #000 */
+  font-weight: 500; /* Thêm độ dày nhẹ cho text khi gõ */
   outline: none;
   background: #f8f9fc;
   transition:
