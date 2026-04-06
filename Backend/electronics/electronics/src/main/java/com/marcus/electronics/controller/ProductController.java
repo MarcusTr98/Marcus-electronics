@@ -16,13 +16,16 @@ public class ProductController {
 
     private final ProductService productService;
 
-    // GET /api/v1/product
+    @GetMapping("/featured")
+    public ResponseEntity<List<ProductListResponseDTO>> getFeaturedProducts() {
+        return ResponseEntity.ok(productService.getFeaturedProducts());
+    }
+
     @GetMapping("")
     public ResponseEntity<List<ProductListResponseDTO>> getAllProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
-    // GET /api/v1/product/1
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductById(@PathVariable Long id) {
         try {
@@ -33,13 +36,16 @@ public class ProductController {
         }
     }
 
-    // GET /api/v1/product/slug/iphone-15-pro-max
     @GetMapping("/slug/{slug}")
     public ResponseEntity<?> getProductBySlug(@PathVariable String slug) {
         try {
-            return ResponseEntity.ok(productService.getProductBySlug(slug));
+            return ResponseEntity.ok(productService.getProductBySlug(slug.trim()));
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            e.printStackTrace();
+            if (e.getMessage() != null && e.getMessage().contains("Không tìm thấy")) {
+                return ResponseEntity.status(404).body(e.getMessage());
+            }
+            return ResponseEntity.status(500).body("Lỗi hệ thống nội bộ: " + e.getMessage());
         }
     }
 }

@@ -1,18 +1,13 @@
 package com.marcus.electronics.service;
 
-import com.marcus.electronics.dto.ProductDetailResponseDTO;
-import com.marcus.electronics.dto.ProductListResponseDTO;
-import com.marcus.electronics.dto.ProductRequestDTO;
+import com.marcus.electronics.dto.*;
 import com.marcus.electronics.model.*;
 import com.marcus.electronics.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,7 +18,7 @@ public class ProductService {
         private final ProductAttributeValueRepository productAttrRepo;
         private final SkuRepository skuRepository;
         private final CategoryRepository categoryRepository;
-        private final OptionValueRepository optionValueRepository1;
+        private final OptionValueRepository optionValueRepository;
 
         // ==================== CLIENT ====================
 
@@ -46,48 +41,51 @@ public class ProductService {
 
         @Transactional(readOnly = true)
         public ProductDetailResponseDTO getProductBySlug(String slug) {
-                Product product = productRepository.findBySlug(slug)
-                                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + slug));
+                Product product = productRepository.findBySlug(slug.trim())
+                                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với slug: " + slug));
 
-                // Thông số kỹ thuật (EAV)
-                List<ProductAttributeValue> attrValues = productAttrRepo.findByProductId(product.getId());
-                List<ProductDetailResponseDTO.AttributeDTO> attrDTOs = attrValues.stream()
+                // 1. Map Thông số kỹ thuật (EAV)
+                List<ProductDetailResponseDTO.AttributeDTO> attrDTOs = productAttrRepo.findByProductId(product.getId())
+                                .stream()
+                                .filter(av -> av.getAttribute() != null)
                                 .map(av -> ProductDetailResponseDTO.AttributeDTO.builder()
                                                 .name(av.getAttribute().getName())
                                                 .value(av.getValue())
                                                 .build())
                                 .collect(Collectors.toList());
 
-                // SKUs
+                // 2. Map Danh sách SKU (Biến thể)
                 List<Sku> skus = skuRepository.findByProductId(product.getId());
-                List<ProductDetailResponseDTO.SkuDTO> skuDTOs = new ArrayList<>();
-
-                for (Sku sku : skus) {
-                        // Build options map từ skuValue → optionValue → option
+                List<ProductDetailResponseDTO.SkuDTO> skuDTOs = skus.stream().map(sku -> {
                         Map<String, String> optionsMap = new HashMap<>();
                         if (sku.getSkuValues() != null) {
-                                for (SkuValue sv : sku.getSkuValues()) {
-                                        String optionName = sv.getOptionValue().getOption().getName();
-                                        String optionVal = sv.getOptionValue().getValue();
-                                        optionsMap.put(optionName, optionVal);
-                                }
+                                sku.getSkuValues().forEach(sv -> {
+                                        if (sv.getOptionValue() != null && sv.getOptionValue().getOption() != null) {
+                                                optionsMap.put(sv.getOptionValue().getOption().getName(),
+                                                                sv.getOptionValue().getValue());
+                                        }
+                                });
                         }
-
-                        skuDTOs.add(ProductDetailResponseDTO.SkuDTO.builder()
+                        return ProductDetailResponseDTO.SkuDTO.builder()
+                                        .id(sku.getId())
                                         .skuCode(sku.getSkuCode())
-                                        .price(sku.getPrice())
+                                        .price(sku.getPrice()) // Map đúng vào trường price
                                         .stock(sku.getStock())
                                         .imageUrl(sku.getImageUrl())
                                         .options(optionsMap)
-                                        .build());
-                }
+                                        .build();
+                }).collect(Collectors.toList());
 
+                // 3. Trả về DTO tổng hợp
                 return ProductDetailResponseDTO.builder()
                                 .id(product.getId())
                                 .name(product.getName())
                                 .slug(product.getSlug())
                                 .description(product.getDescription())
-                                .categoryName(product.getCategory().getName())
+                                .basePrice(product.getBasePrice())
+                                .thumbnailUrl(product.getThumbnailUrl())
+                                .categoryName(product.getCategory() != null ? product.getCategory().getName()
+                                                : "Chưa phân loại")
                                 .attributes(attrDTOs)
                                 .skus(skuDTOs)
                                 .build();
@@ -100,30 +98,22 @@ public class ProductService {
                 List<Product> products = productRepository.findAll();
                 List<Sku> allSkus = skuRepository.findAll();
 
-                // 1. Map Tồn kho tổng
                 Map<Long, Integer> stockMap = allSkus.stream()
                                 .collect(Collectors.groupingBy(
                                                 sku -> sku.getProduct().getId(),
                                                 Collectors.summingInt(
                                                                 sku -> sku.getStock() != null ? sku.getStock() : 0)));
 
-                // 2. Lấy toàn bộ OptionValue (Cần viết @Query "SELECT ov FROM OptionValue ov
-                // JOIN FETCH ov.option" để tối ưu)
-                List<OptionValue> allOptionValues = optionValueRepository1.findAll();
+                // ĐÃ SỬA: Gọi đúng tên repository
+                List<OptionValue> allOptionValues = optionValueRepository.findAll();
 
-                // 3. LOGIC SẮC BÉN: Gom nhóm đa tầng -> Map<ProductID, Map<Tên_Thuộc_Tính,
-                // Số_Lượng_Giá_Trị>>
                 Map<Long, Map<String, Long>> variantSummaryMap = allOptionValues.stream()
                                 .collect(Collectors.groupingBy(
-                                                ov -> ov.getOption().getProduct().getId(), // Nhóm 1: Theo ID Sản phẩm
+                                                ov -> ov.getOption().getProduct().getId(),
                                                 Collectors.groupingBy(
-                                                                ov -> ov.getOption().getName(), // Nhóm 2: Theo Tên
-                                                                                                // Thuộc tính (Màu sắc)
-                                                                Collectors.counting() // Đếm số lượng giá trị (Đỏ,
-                                                                                      // Xanh...)
-                                                )));
+                                                                ov -> ov.getOption().getName(),
+                                                                Collectors.counting())));
 
-                // 4. Map vào DTO
                 return products.stream()
                                 .map(p -> ProductListResponseDTO.builder()
                                                 .id(p.getId())
@@ -135,7 +125,6 @@ public class ProductService {
                                                 .basePrice(p.getBasePrice())
                                                 .active(p.getIsActive())
                                                 .totalStock(stockMap.getOrDefault(p.getId(), 0))
-                                                // Gắn Map Summary vào đây
                                                 .variantSummary(variantSummaryMap.getOrDefault(p.getId(),
                                                                 new java.util.HashMap<>()))
                                                 .build())
@@ -150,11 +139,9 @@ public class ProductService {
 
         @Transactional
         public void createProduct(ProductRequestDTO dto) {
-                // 1. Kiểm tra Category có tồn tại không
                 Category category = categoryRepository.findById(dto.getCategoryId())
                                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại"));
 
-                // 2. Map dữ liệu từ DTO sang Entity
                 Product product = Product.builder()
                                 .name(dto.getName())
                                 .slug(dto.getSlug())
@@ -180,7 +167,6 @@ public class ProductService {
                 Category category = categoryRepository.findById(dto.getCategoryId())
                                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại"));
 
-                // Cập nhật thông tin
                 product.setName(dto.getName());
                 product.setSlug(dto.getSlug());
                 product.setDescription(dto.getDescription());
@@ -203,7 +189,6 @@ public class ProductService {
         public void deleteProduct(Long id) {
                 Product product = productRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
-                // Soft Delete
                 product.setIsActive(false);
                 productRepository.save(product);
         }
@@ -212,8 +197,23 @@ public class ProductService {
         public void restoreProduct(Long id) {
                 Product product = productRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
-                // Khôi phục
                 product.setIsActive(true);
                 productRepository.save(product);
+        }
+
+        @Transactional(readOnly = true)
+        public List<ProductListResponseDTO> getFeaturedProducts() {
+                org.springframework.data.domain.Pageable topEight = org.springframework.data.domain.PageRequest.of(0,
+                                8);
+                List<Product> products = productRepository.findByIsActiveTrueOrderByIdDesc(topEight);
+
+                return products.stream().map(p -> ProductListResponseDTO.builder()
+                                .id(p.getId())
+                                .name(p.getName())
+                                .slug(p.getSlug())
+                                .thumbnailUrl(p.getThumbnailUrl())
+                                .basePrice(p.getBasePrice())
+                                .categoryName(p.getCategory() != null ? p.getCategory().getName() : "Khác")
+                                .build()).collect(java.util.stream.Collectors.toList());
         }
 }

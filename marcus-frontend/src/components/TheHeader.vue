@@ -1,34 +1,64 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
+
+// State cho Giỏ hàng
 const totalMoney = ref(0);
 const totalQuantity = ref(0);
 
-// Hàm tính toán lại giỏ hàng từ LocalStorage
+// State cho Xác thực (Auth)
+const isLoggedIn = ref(false);
+const userName = ref("");
+
+// Kiểm tra trạng thái đăng nhập
+const checkAuth = () => {
+  const token = localStorage.getItem("ACCESS_TOKEN");
+  const name = localStorage.getItem("USERNAME");
+
+  if (token) {
+    isLoggedIn.value = true;
+    userName.value = name || "Khách hàng";
+  } else {
+    isLoggedIn.value = false;
+    userName.value = "";
+  }
+};
+
+// Xử lý Đăng xuất
+const handleLogout = () => {
+  if (!confirm("Bạn có chắc chắn muốn đăng xuất?")) return;
+
+  localStorage.removeItem("ACCESS_TOKEN");
+  localStorage.removeItem("USER_ROLE");
+  localStorage.removeItem("USERNAME");
+
+  isLoggedIn.value = false;
+  router.push("/login");
+};
+
+// Tính toán lại giỏ hàng
 const updateCartHeader = () => {
   const cart = JSON.parse(localStorage.getItem("marcus_cart")) || [];
-
-  // Tính tổng tiền
   totalMoney.value = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
-
-  // Tính tổng số lượng item (để hiện số đỏ trên icon)
   totalQuantity.value = cart.reduce((total, item) => total + item.quantity, 0);
 };
 
 onMounted(() => {
-  // 1. Tính toán ngay khi vào trang
+  checkAuth();
   updateCartHeader();
-
-  // 2. Đăng ký lắng nghe sự kiện "cart-updated"
-  // (Bất cứ khi nào có nút thêm/xóa giỏ hàng được bấm, sự kiện này sẽ chạy)
   window.addEventListener("cart-updated", updateCartHeader);
+  // Lắng nghe thêm sự kiện login thành công (nếu cần thiết lập ở LoginView)
+  window.addEventListener("auth-changed", checkAuth);
 });
 
 onUnmounted(() => {
   window.removeEventListener("cart-updated", updateCartHeader);
+  window.removeEventListener("auth-changed", checkAuth);
 });
 </script>
 
@@ -53,12 +83,52 @@ onUnmounted(() => {
             >
           </div>
         </div>
+
         <div class="col-lg-4 text-center text-lg-end">
           <div class="d-inline-flex align-items-center" style="height: 45px">
-            <a href="#" class="text-dark small"
-              ><i class="fa fa-user text-primary me-2"></i> Đăng nhập / Đăng
-              ký</a
-            >
+            <template v-if="!isLoggedIn">
+              <router-link
+                to="/login"
+                class="text-dark small text-decoration-none"
+              >
+                <i class="fa fa-user text-primary me-2"></i> Đăng nhập / Đăng ký
+              </router-link>
+            </template>
+            <template v-else>
+              <div class="dropdown">
+                <a
+                  href="#"
+                  class="text-dark small text-decoration-none dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                >
+                  <i class="fa fa-user text-primary me-2"></i> Xin chào,
+                  <span class="fw-bold">{{ userName }}</span>
+                </a>
+                <ul
+                  class="dropdown-menu dropdown-menu-end shadow border-0 mt-2"
+                >
+                  <li>
+                    <router-link class="dropdown-item" to="/profile"
+                      >Tài khoản của tôi</router-link
+                    >
+                  </li>
+                  <li>
+                    <router-link class="dropdown-item" to="/my-orders"
+                      >Đơn mua</router-link
+                    >
+                  </li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li>
+                    <a
+                      class="dropdown-item text-danger"
+                      href="#"
+                      @click.prevent="handleLogout"
+                      >Đăng xuất</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -67,11 +137,11 @@ onUnmounted(() => {
     <div class="container-fluid px-5 py-4 bg-white border-bottom">
       <div class="row align-items-center">
         <div class="col-md-3">
-          <a href="/" class="navbar-brand">
+          <router-link to="/" class="navbar-brand text-decoration-none">
             <h1 class="display-5 text-primary m-0 fw-bold">
               <i class="fas fa-shopping-bag text-secondary me-2"></i>Marcus
             </h1>
-          </a>
+          </router-link>
         </div>
 
         <div class="col-md-6">
@@ -93,7 +163,10 @@ onUnmounted(() => {
 
         <div class="col-md-3 text-end">
           <div class="d-inline-flex align-items-center">
-            <router-link to="/cart" class="position-relative">
+            <router-link
+              to="/cart"
+              class="position-relative text-decoration-none"
+            >
               <span
                 class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success"
               >
@@ -129,7 +202,7 @@ onUnmounted(() => {
             >
             <a href="#" class="nav-item nav-link px-4">ĐIỆN THOẠI</a>
             <a href="#" class="nav-item nav-link px-4">LAPTOP</a>
-            <a href="#" class="nav-item nav-link px-4">LIÊN HỆ</a>
+            <a href="#" class="nav-item nav-link px-4">PHỤ KIỆN</a>
           </div>
         </div>
       </nav>
@@ -152,5 +225,9 @@ onUnmounted(() => {
 .navbar-dark .navbar-nav .nav-link.active {
   color: #ffffff;
   background-color: rgba(255, 255, 255, 0.1);
+}
+/* Sửa nhỏ để dropdown hiển thị chuẩn trên layout Bootstrap */
+.dropdown-menu {
+  z-index: 1050;
 }
 </style>

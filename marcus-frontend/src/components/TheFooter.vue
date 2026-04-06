@@ -87,21 +87,31 @@
 
         <div class="col-lg-2 col-md-6">
           <h4 class="text-white mb-4">Mua hàng</h4>
-          <a class="btn btn-link text-white-50" href="#">Điện thoại iPhone</a>
-          <a class="btn btn-link text-white-50" href="#">Laptop Gaming</a>
-          <a class="btn btn-link text-white-50" href="#">Phụ kiện giá rẻ</a>
-          <a class="btn btn-link text-white-50" href="#">Hàng cũ giá rẻ</a>
+          <router-link
+            class="btn btn-link text-white-50"
+            to="/category/dien-thoai"
+            >Điện thoại iPhone</router-link
+          >
+          <router-link class="btn btn-link text-white-50" to="/category/laptop"
+            >Laptop Gaming</router-link
+          >
+          <router-link
+            class="btn btn-link text-white-50"
+            to="/category/phu-kien"
+            >Phụ kiện giá rẻ</router-link
+          >
         </div>
 
         <div class="col-lg-2 col-md-6">
           <h4 class="text-white mb-4">Hỗ trợ</h4>
-          <a class="btn btn-link text-white-50" href="#">Trung tâm bảo hành</a>
-          <a class="btn btn-link text-white-50" href="#">Chính sách đổi trả</a>
-          <a class="btn btn-link text-white-50" href="#"
-            >Giao hàng & Thanh toán</a
+          <router-link class="btn btn-link text-white-50" to="/bao-hanh"
+            >Trung tâm bảo hành</router-link
           >
-          <a class="btn btn-link text-white-50" href="#"
-            >Hướng dẫn mua online</a
+          <router-link class="btn btn-link text-white-50" to="/doi-tra"
+            >Chính sách đổi trả</router-link
+          >
+          <router-link class="btn btn-link text-white-50" to="/thanh-toan"
+            >Giao hàng & Thanh toán</router-link
           >
         </div>
 
@@ -133,8 +143,9 @@
         <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
           <span class="text-light">
             &copy; 2026
-            <a href="#" class="text-white border-bottom">Marcus Electronics</a>.
-            All Right Reserved.
+            <router-link to="/" class="text-white border-bottom"
+              >Marcus Electronics</router-link
+            >. All Right Reserved.
           </span>
         </div>
         <div class="col-md-6 text-center text-md-end text-white">
@@ -147,12 +158,11 @@
 </template>
 
 <style scoped>
-/* CSS Footer riêng biệt */
+/* Giữ nguyên CSS bạn đã cung cấp */
 .footer {
-  background-color: #0b1c2c; /* Màu nền xanh đen đậm chất công nghệ */
+  background-color: #0b1c2c;
   color: #ffffff;
 }
-
 .footer .btn.btn-social {
   margin-right: 5px;
   width: 35px;
@@ -165,12 +175,10 @@
   border-radius: 35px;
   transition: 0.3s;
 }
-
 .footer .btn.btn-social:hover {
-  color: var(--bs-primary); /* Hover ra màu xanh FPT */
+  color: var(--bs-primary);
   background: var(--bs-white);
 }
-
 .footer .btn-link {
   display: block;
   margin-bottom: 5px;
@@ -182,7 +190,6 @@
   transition: 0.3s;
   text-decoration: none;
 }
-
 .footer .btn-link::before {
   position: relative;
   content: "\f105";
@@ -190,14 +197,11 @@
   font-weight: 900;
   margin-right: 10px;
 }
-
 .footer .btn-link:hover {
   letter-spacing: 1px;
   box-shadow: none;
-  color: var(--bs-secondary); /* Hover link ra màu cam */
+  color: var(--bs-secondary);
 }
-
-/* Biểu tượng tròn trên footer */
 .btn-square {
   width: 60px;
   height: 60px;
