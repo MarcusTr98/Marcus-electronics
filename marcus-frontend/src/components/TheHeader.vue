@@ -52,7 +52,6 @@ onMounted(() => {
   checkAuth();
   updateCartHeader();
   window.addEventListener("cart-updated", updateCartHeader);
-  // Lắng nghe thêm sự kiện login thành công (nếu cần thiết lập ở LoginView)
   window.addEventListener("auth-changed", checkAuth);
 });
 
@@ -63,171 +62,300 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="fixed-top-header">
-    <div class="container-fluid topbar bg-light px-5 d-none d-lg-block">
-      <div class="row gx-0 align-items-center">
-        <div class="col-lg-4 text-center text-lg-start mb-lg-0">
-          <div class="d-inline-flex align-items-center" style="height: 45px">
-            <a href="#" class="text-muted me-2 small">Chính sách</a
-            ><small class="text-muted"> / </small>
-            <a href="#" class="text-muted mx-2 small">Hỗ trợ</a
-            ><small class="text-muted"> / </small>
-            <a href="#" class="text-muted ms-2 small">Liên hệ</a>
+  <header class="modern-header sticky-top">
+    <div class="main-header bg-white shadow-sm py-3">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-6 col-lg-4">
+            <router-link to="/" class="text-decoration-none">
+              <h3
+                class="m-0 fw-black text-dark brand-logo tracking-tight d-flex align-items-center"
+              >
+                <i
+                  class="fas fa-bolt me-3"
+                  style="color: #ff6b00; font-size: 2.2rem"
+                ></i>
+                <span style="font-size: 2rem">Marcus Electronics</span>
+              </h3>
+            </router-link>
+          </div>
+
+          <div class="col-12 col-lg-4 mt-3 mt-lg-0 order-3 order-lg-2">
+            <div class="search-wrapper position-relative">
+              <input
+                type="text"
+                class="form-control rounded-pill bg-light border-0 px-4 py-2 custom-search"
+                placeholder="Bạn muốn tìm gì hôm nay?"
+              />
+              <button
+                class="btn text-muted position-absolute end-0 top-0 h-100 px-4 rounded-pill border-0 search-btn"
+              >
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="col-6 col-lg-4 text-end order-2 order-lg-3 d-flex justify-content-end align-items-center gap-3"
+          >
+            <div class="user-action">
+              <template v-if="!isLoggedIn">
+                <router-link
+                  to="/login"
+                  class="action-btn text-decoration-none d-flex align-items-center"
+                >
+                  <div class="icon-box"><i class="far fa-user"></i></div>
+                  <div class="text-start ms-2 d-none d-xl-block">
+                    <span class="d-block text-muted small-text">Đăng nhập</span>
+                    <span class="fw-semibold text-dark">Tài khoản</span>
+                  </div>
+                </router-link>
+              </template>
+
+              <template v-else>
+                <div class="dropdown">
+                  <a
+                    href="#"
+                    class="action-btn text-decoration-none d-flex align-items-center"
+                    data-bs-toggle="dropdown"
+                  >
+                    <div class="icon-box active">
+                      <i class="far fa-user"></i>
+                    </div>
+                    <div class="text-start ms-2 d-none d-xl-block">
+                      <span class="d-block text-muted small-text"
+                        >Xin chào,</span
+                      >
+                      <span class="fw-semibold text-dark">{{ userName }}</span>
+                    </div>
+                  </a>
+                  <ul
+                    class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 mt-3"
+                  >
+                    <li>
+                      <router-link class="dropdown-item py-2" to="/profile"
+                        ><i class="far fa-id-badge me-2 text-primary"></i>Tài
+                        khoản</router-link
+                      >
+                    </li>
+                    <li>
+                      <router-link class="dropdown-item py-2" to="/my-orders"
+                        ><i class="fas fa-box-open me-2 text-primary"></i>Đơn
+                        mua</router-link
+                      >
+                    </li>
+                    <li><hr class="dropdown-divider mx-3" /></li>
+                    <li>
+                      <a
+                        class="dropdown-item text-danger py-2"
+                        href="#"
+                        @click.prevent="handleLogout"
+                        ><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </template>
+            </div>
+
+            <router-link
+              to="/cart"
+              class="action-btn text-decoration-none d-flex align-items-center"
+            >
+              <div class="icon-box position-relative">
+                <i class="fas fa-shopping-bag"></i>
+                <span v-if="totalQuantity > 0" class="cart-badge">{{
+                  totalQuantity
+                }}</span>
+              </div>
+              <div class="text-start ms-2 d-none d-xl-block">
+                <span class="d-block text-muted small-text">Giỏ hàng</span>
+                <span class="fw-bold" style="color: #ff6b00"
+                  >{{ totalMoney.toLocaleString("vi-VN") }} ₫</span
+                >
+              </div>
+            </router-link>
           </div>
         </div>
-        <div class="col-lg-4 text-center">
-          <div class="d-inline-flex align-items-center justify-content-center">
-            <small class="text-dark me-2">Hotline tư vấn:</small>
-            <a href="tel:0907640098" class="text-primary fw-bold mb-0"
+      </div>
+    </div>
+
+    <div class="nav-bottom bg-white border-top d-none d-lg-block shadow-sm">
+      <div class="container d-flex justify-content-between align-items-center">
+        <nav class="d-flex gap-4">
+          <router-link to="/" class="nav-item-link active"
+            >TRANG CHỦ</router-link
+          >
+          <a href="#" class="nav-item-link">ĐIỆN THOẠI</a>
+          <a href="#" class="nav-item-link">LAPTOP</a>
+          <a href="#" class="nav-item-link">PHỤ KIỆN</a>
+          <a href="#" class="nav-item-link">ĐỒNG HỒ</a>
+        </nav>
+
+        <div class="d-flex align-items-center gap-4 py-2">
+          <nav class="d-flex gap-3 auxiliary-links">
+            <a
+              href="#"
+              class="text-muted text-decoration-none fw-semibold auxiliary-link-item"
+              >Chính sách</a
+            >
+            <a
+              href="#"
+              class="text-muted text-decoration-none fw-semibold auxiliary-link-item"
+              >Hỗ trợ</a
+            >
+            <a
+              href="#"
+              class="text-muted text-decoration-none fw-semibold auxiliary-link-item"
+              >Liên hệ</a
+            >
+          </nav>
+          <div class="hotline-box bg-light px-4 py-2 rounded-pill border">
+            <i
+              class="fas fa-phone-alt me-2"
+              style="color: #ff6b00; font-size: 1.1rem"
+            ></i>
+            <a
+              href="tel:0907640098"
+              class="text-dark fw-bold text-decoration-none m-0 auxiliary-link-item"
               >(+84) 907 640 098</a
             >
           </div>
         </div>
-
-        <div class="col-lg-4 text-center text-lg-end">
-          <div class="d-inline-flex align-items-center" style="height: 45px">
-            <template v-if="!isLoggedIn">
-              <router-link
-                to="/login"
-                class="text-dark small text-decoration-none"
-              >
-                <i class="fa fa-user text-primary me-2"></i> Đăng nhập / Đăng ký
-              </router-link>
-            </template>
-            <template v-else>
-              <div class="dropdown">
-                <a
-                  href="#"
-                  class="text-dark small text-decoration-none dropdown-toggle"
-                  data-bs-toggle="dropdown"
-                >
-                  <i class="fa fa-user text-primary me-2"></i> Xin chào,
-                  <span class="fw-bold">{{ userName }}</span>
-                </a>
-                <ul
-                  class="dropdown-menu dropdown-menu-end shadow border-0 mt-2"
-                >
-                  <li>
-                    <router-link class="dropdown-item" to="/profile"
-                      >Tài khoản của tôi</router-link
-                    >
-                  </li>
-                  <li>
-                    <router-link class="dropdown-item" to="/my-orders"
-                      >Đơn mua</router-link
-                    >
-                  </li>
-                  <li><hr class="dropdown-divider" /></li>
-                  <li>
-                    <a
-                      class="dropdown-item text-danger"
-                      href="#"
-                      @click.prevent="handleLogout"
-                      >Đăng xuất</a
-                    >
-                  </li>
-                </ul>
-              </div>
-            </template>
-          </div>
-        </div>
       </div>
     </div>
-
-    <div class="container-fluid px-5 py-4 bg-white border-bottom">
-      <div class="row align-items-center">
-        <div class="col-md-3">
-          <router-link to="/" class="navbar-brand text-decoration-none">
-            <h1 class="display-5 text-primary m-0 fw-bold">
-              <i class="fas fa-shopping-bag text-secondary me-2"></i>Marcus
-            </h1>
-          </router-link>
-        </div>
-
-        <div class="col-md-6">
-          <div class="position-relative">
-            <div class="input-group">
-              <input
-                type="text"
-                class="form-control border-2 border-primary py-3 rounded-start-pill"
-                placeholder="Bạn tìm gì hôm nay?"
-              />
-              <button
-                class="btn btn-primary border-2 border-primary py-3 px-4 rounded-end-pill"
-              >
-                <i class="fas fa-search text-white"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-3 text-end">
-          <div class="d-inline-flex align-items-center">
-            <router-link
-              to="/cart"
-              class="position-relative text-decoration-none"
-            >
-              <span
-                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success"
-              >
-                {{ totalQuantity }}
-              </span>
-              <i class="fa fa-shopping-cart fa-2x text-secondary"></i>
-            </router-link>
-            <div class="ms-3 text-start">
-              <p class="small text-muted mb-0">Giỏ hàng</p>
-              <h6 class="text-dark m-0">
-                {{ totalMoney.toLocaleString("vi-VN") }} ₫
-              </h6>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="container-fluid bg-primary px-5">
-      <nav class="navbar navbar-expand-lg navbar-dark p-0">
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarCollapse"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-          <div class="navbar-nav me-auto">
-            <router-link to="/" class="nav-item nav-link active px-4"
-              >TRANG CHỦ</router-link
-            >
-            <a href="#" class="nav-item nav-link px-4">ĐIỆN THOẠI</a>
-            <a href="#" class="nav-item nav-link px-4">LAPTOP</a>
-            <a href="#" class="nav-item nav-link px-4">PHỤ KIỆN</a>
-          </div>
-        </div>
-      </nav>
-    </div>
-  </div>
+  </header>
 </template>
 
 <style scoped>
-.topbar {
-  font-size: 14px;
+.modern-header {
+  font-family: "Inter", sans-serif;
 }
-.navbar-dark .navbar-nav .nav-link {
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  transition: 0.3s;
+
+/* Typography & Layout */
+.fw-black {
+  font-weight: 800;
 }
-.navbar-dark .navbar-nav .nav-link:hover,
-.navbar-dark .navbar-nav .nav-link.active {
-  color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.1);
+.tracking-tight {
+  letter-spacing: -1px;
+} /* Tighten slightly for larger size */
+.small-text {
+  font-size: 11px;
+  line-height: 1.2;
 }
-/* Sửa nhỏ để dropdown hiển thị chuẩn trên layout Bootstrap */
+
+/* Search Bar */
+.custom-search {
+  transition: all 0.3s ease;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+.custom-search:focus {
+  background-color: #fff !important;
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.15); /* Orange glow */
+  outline: none;
+}
+.search-btn:hover i {
+  color: #ff6b00;
+}
+
+/* User & Cart Actions */
+.action-btn {
+  padding: 6px 12px;
+  border-radius: 50px;
+  transition: all 0.2s ease;
+}
+.action-btn:hover {
+  background-color: #f8f9fa;
+}
+.icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f1f3f5;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+.action-btn:hover .icon-box,
+.icon-box.active {
+  background-color: #ff6b00;
+  color: white;
+}
+.cart-badge {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  background-color: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 20px;
+  border: 2px solid white;
+}
+
+/* Dropdown Animation */
 .dropdown-menu {
-  z-index: 1050;
+  animation: fade-in 0.2s ease-out;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Navigation Bottom - TĂNG CỠ CHỮ LÊN RẤT NHIỀU */
+.nav-item-link {
+  color: #4b5563;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 16px; /* TO LÊN */
+  padding: 20px 0; /* Increase vertical space slightly */
+  position: relative;
+  transition: color 0.3s ease;
+}
+.nav-item-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 4px; /* Slightly thicker underline */
+  background-color: #ff6b00;
+  border-radius: 4px 4px 0 0;
+  transition: width 0.3s ease;
+}
+.nav-item-link:hover,
+.nav-item-link.active {
+  color: #ff6b00;
+}
+.nav-item-link:hover::after,
+.nav-item-link.active::after {
+  width: 100%;
+}
+
+/* Auxiliary Links & Hotline - TO LÊN */
+.auxiliary-link-item {
+  font-size: 14px; /* TO LÊN */
+}
+.auxiliary-links a:hover {
+  color: #ff6b00 !important;
+  transition: color 0.2s;
+}
+.hotline-box {
+  transition: all 0.2s ease;
+}
+.hotline-box:hover {
+  background-color: #fff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: #ff6b00 !important;
 }
 </style>

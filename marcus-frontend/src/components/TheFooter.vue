@@ -1,212 +1,306 @@
 <template>
-  <div
-    class="container-fluid footer pt-5 mt-5 wow fadeIn"
-    data-wow-delay="0.1s"
-  >
-    <div class="container-fluid px-5 py-5">
-      <div class="row g-4 mb-5 pb-4 border-bottom border-secondary">
+  <footer class="modern-footer pt-4 mt-4">
+    <div class="container px-4 py-4">
+      <div
+        class="row g-3 mb-4 pb-4 border-bottom border-secondary-subtle info-row"
+      >
         <div class="col-lg-3 col-md-6">
-          <div class="d-flex align-items-center">
-            <div
-              class="btn-square bg-secondary rounded-circle text-white p-4 me-3"
-            >
-              <i class="fas fa-map-marker-alt fa-2x"></i>
+          <div class="d-flex align-items-center info-card">
+            <div class="icon-circle shadow-sm me-3">
+              <i class="fas fa-map-marker-alt"></i>
             </div>
             <div>
-              <h5 class="text-white mb-1">Địa chỉ</h5>
-              <p class="mb-0 text-white-50">Hải Phòng, Việt Nam</p>
+              <h6 class="mb-1 fw-bold footer-main-text">Trụ sở chính</h6>
+              <p class="mb-0 small footer-sub-text">Hải Phòng, Việt Nam</p>
             </div>
           </div>
         </div>
         <div class="col-lg-3 col-md-6">
-          <div class="d-flex align-items-center">
-            <div
-              class="btn-square bg-secondary rounded-circle text-white p-4 me-3"
-            >
-              <i class="fas fa-envelope fa-2x"></i>
+          <div class="d-flex align-items-center info-card">
+            <div class="icon-circle shadow-sm me-3">
+              <i class="fas fa-envelope"></i>
             </div>
             <div>
-              <h5 class="text-white mb-1">Email Hỗ trợ</h5>
-              <p class="mb-0 text-white-50">support@marcus.com</p>
+              <h6 class="mb-1 fw-bold footer-main-text">Email Hỗ trợ</h6>
+              <p class="mb-0 small footer-sub-text">support@marcus.com</p>
             </div>
           </div>
         </div>
         <div class="col-lg-3 col-md-6">
-          <div class="d-flex align-items-center">
-            <div
-              class="btn-square bg-secondary rounded-circle text-white p-4 me-3"
-            >
-              <i class="fa fa-phone-alt fa-2x"></i>
+          <div class="d-flex align-items-center info-card">
+            <div class="icon-circle shadow-sm me-3">
+              <i class="fa fa-phone-alt"></i>
             </div>
             <div>
-              <h5 class="text-white mb-1">Tổng đài</h5>
-              <p class="mb-0 text-white-50">(+84) 907 640 098</p>
+              <h6 class="mb-1 fw-bold footer-main-text">Hotline (24/7)</h6>
+              <p class="mb-0 small footer-sub-text">(+84) 907 640 098</p>
             </div>
           </div>
         </div>
         <div class="col-lg-3 col-md-6">
-          <div class="d-flex align-items-center">
-            <div
-              class="btn-square bg-secondary rounded-circle text-white p-4 me-3"
-            >
-              <i class="fa fa-clock fa-2x"></i>
+          <div class="d-flex align-items-center info-card">
+            <div class="icon-circle shadow-sm me-3">
+              <i class="fa fa-clock"></i>
             </div>
             <div>
-              <h5 class="text-white mb-1">Giờ làm việc</h5>
-              <p class="mb-0 text-white-50">08:00 - 21:00 (Hàng ngày)</p>
+              <h6 class="mb-1 fw-bold footer-main-text">Giờ làm việc</h6>
+              <p class="mb-0 small footer-sub-text">
+                08:00 - 21:00 (Hàng ngày)
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="row g-5">
-        <div class="col-lg-4 col-md-6">
-          <h1 class="text-primary mb-4">
-            <i class="fas fa-shopping-bag text-secondary me-2"></i>Marcus
-          </h1>
-          <p class="text-white-50 mb-4">
-            Hệ thống bán lẻ Marcus Electronics chuyên cung cấp iPhone, Laptop,
-            Phụ kiện công nghệ chính hãng giá tốt nhất thị trường. Cam kết bảo
-            hành uy tín, hậu mãi dài lâu.
+      <div class="row g-4">
+        <div class="col-lg-4 col-md-6 pe-lg-5">
+          <h3
+            class="mb-3 fw-black tracking-tight d-flex align-items-center footer-logo-text"
+          >
+            <i class="fas fa-bolt me-2 text-white"></i>
+            <span style="font-size: 1.5rem">Marcus Electronics</span>
+          </h3>
+          <p
+            class="mb-4 pe-lg-4 lh-base footer-sub-text"
+            style="font-size: 14px"
+          >
+            Hệ thống bán lẻ Marcus Electronics chuyên cung cấp thiết bị công
+            nghệ chính hãng giá tốt nhất thị trường. Cam kết bảo hành uy tín,
+            hậu mãi dài lâu.
           </p>
-          <div class="d-flex pt-2">
-            <a class="btn btn-outline-light btn-social me-2" href="#"
-              ><i class="fab fa-twitter"></i
-            ></a>
-            <a class="btn btn-outline-light btn-social me-2" href="#"
-              ><i class="fab fa-facebook-f"></i
-            ></a>
-            <a class="btn btn-outline-light btn-social me-2" href="#"
-              ><i class="fab fa-youtube"></i
-            ></a>
-            <a class="btn btn-outline-light btn-social" href="#"
-              ><i class="fab fa-tiktok"></i
-            ></a>
+          <div class="d-flex gap-2">
+            <a class="social-btn" href="#"><i class="fab fa-facebook-f"></i></a>
+            <a class="social-btn" href="#"><i class="fab fa-youtube"></i></a>
+            <a class="social-btn" href="#"><i class="fab fa-tiktok"></i></a>
+            <a class="social-btn" href="#"><i class="fab fa-instagram"></i></a>
           </div>
         </div>
 
         <div class="col-lg-2 col-md-6">
-          <h4 class="text-white mb-4">Mua hàng</h4>
-          <router-link
-            class="btn btn-link text-white-50"
-            to="/category/dien-thoai"
-            >Điện thoại iPhone</router-link
+          <h6
+            class="mb-3 fw-bold text-uppercase tracking-wider footer-main-text"
           >
-          <router-link class="btn btn-link text-white-50" to="/category/laptop"
-            >Laptop Gaming</router-link
-          >
-          <router-link
-            class="btn btn-link text-white-50"
-            to="/category/phu-kien"
-            >Phụ kiện giá rẻ</router-link
-          >
+            Danh mục
+          </h6>
+          <nav class="d-flex flex-column gap-2">
+            <router-link class="footer-link" to="/category/dien-thoai"
+              >Điện thoại iPhone</router-link
+            >
+            <router-link class="footer-link" to="/category/laptop"
+              >Laptop Gaming</router-link
+            >
+            <router-link class="footer-link" to="/category/phu-kien"
+              >Phụ kiện công nghệ</router-link
+            >
+            <router-link class="footer-link" to="/category/dong-ho"
+              >Đồng hồ thông minh</router-link
+            >
+          </nav>
         </div>
 
         <div class="col-lg-2 col-md-6">
-          <h4 class="text-white mb-4">Hỗ trợ</h4>
-          <router-link class="btn btn-link text-white-50" to="/bao-hanh"
-            >Trung tâm bảo hành</router-link
+          <h6
+            class="mb-3 fw-bold text-uppercase tracking-wider footer-main-text"
           >
-          <router-link class="btn btn-link text-white-50" to="/doi-tra"
-            >Chính sách đổi trả</router-link
-          >
-          <router-link class="btn btn-link text-white-50" to="/thanh-toan"
-            >Giao hàng & Thanh toán</router-link
-          >
+            Chính sách
+          </h6>
+          <nav class="d-flex flex-column gap-2">
+            <router-link class="footer-link" to="/bao-hanh"
+              >Trung tâm bảo hành</router-link
+            >
+            <router-link class="footer-link" to="/doi-tra"
+              >Chính sách đổi trả</router-link
+            >
+            <router-link class="footer-link" to="/thanh-toan"
+              >Giao hàng & Thanh toán</router-link
+            >
+            <router-link class="footer-link" to="/bao-mat"
+              >Bảo mật thông tin</router-link
+            >
+          </nav>
         </div>
 
         <div class="col-lg-4 col-md-6">
-          <h4 class="text-white mb-4">Đăng ký nhận tin</h4>
-          <p class="text-white-50">
-            Nhận ngay voucher giảm giá 100K khi đăng ký email nhận tin khuyến
-            mãi.
+          <h6
+            class="mb-3 fw-bold text-uppercase tracking-wider footer-main-text"
+          >
+            Nhận tin khuyến mãi
+          </h6>
+          <p class="mb-3 footer-sub-text" style="font-size: 14px">
+            Nhận ngay voucher giảm giá 100K khi đăng ký email.
           </p>
-          <div class="position-relative mx-auto" style="max-width: 400px">
+          <div class="subscribe-form">
             <input
-              class="form-control bg-transparent w-100 py-3 ps-4 pe-5 text-white"
-              type="text"
-              placeholder="Email của bạn"
+              class="form-control rounded-pill bg-transparent px-3 py-2 custom-input"
+              type="email"
+              placeholder="Nhập email của bạn..."
             />
             <button
-              type="button"
-              class="btn btn-secondary py-2 position-absolute top-0 end-0 mt-2 me-2"
+              class="btn rounded-pill px-4 py-2 mt-2 w-100 fw-semibold shadow-sm custom-btn-dark"
             >
-              Đăng ký
+              Đăng ký ngay <i class="fas fa-paper-plane ms-2"></i>
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="container-fluid copyright bg-primary py-4 px-5">
-      <div class="row">
-        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-          <span class="text-light">
-            &copy; 2026
-            <router-link to="/" class="text-white border-bottom"
-              >Marcus Electronics</router-link
-            >. All Right Reserved.
-          </span>
-        </div>
-        <div class="col-md-6 text-center text-md-end text-white">
-          Designed By
-          <a class="border-bottom text-white" href="#">Marcus Tran</a>
+    <div class="copyright-bar mt-4">
+      <div class="container py-3 border-top border-secondary-subtle">
+        <div class="row align-items-center">
+          <div class="col-md-6 text-center text-md-start mb-2 mb-md-0">
+            <span class="small footer-sub-text">
+              &copy; 2026
+              <router-link
+                to="/"
+                class="text-decoration-none fw-semibold hover-dark footer-main-text"
+              >
+                Marcus Electronics </router-link
+              >. All Rights Reserved.
+            </span>
+          </div>
+          <div class="col-md-6 text-center text-md-end">
+            <span class="small footer-sub-text">
+              Crafted logically by
+              <a
+                class="text-decoration-none fw-semibold hover-dark footer-main-text"
+                href="#"
+              >
+                Marcus Tran
+              </a>
+            </span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </footer>
 </template>
 
 <style scoped>
-/* Giữ nguyên CSS bạn đã cung cấp */
-.footer {
-  background-color: #0b1c2c;
+.modern-footer {
+  background-color: #ff6b00; /* Màu cam chủ đạo của brand */
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+}
+
+/* Utilities for high contrast on orange background */
+.footer-main-text {
+  color: #ffffff !important;
+}
+.footer-sub-text {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+.footer-logo-text {
+  color: #ffffff !important;
+}
+.border-secondary-subtle {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+.fw-black {
+  font-weight: 800;
+}
+.tracking-tight {
+  letter-spacing: -0.5px;
+}
+.tracking-wider {
+  letter-spacing: 1px;
+  font-size: 12px;
+}
+
+/* Info Cards */
+.icon-circle {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+.info-card:hover .icon-circle {
+  background: #ffffff;
+  color: #ff6b00; /* Trả lại màu cam khi hover để tạo điểm nhấn */
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Links */
+.footer-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+}
+.footer-link::before {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 2px;
+  background-color: #ffffff;
+  margin-right: 0;
+  transition: all 0.3s ease;
+}
+.footer-link:hover {
   color: #ffffff;
 }
-.footer .btn.btn-social {
-  margin-right: 5px;
-  width: 35px;
-  height: 35px;
+.footer-link:hover::before {
+  width: 10px;
+  margin-right: 8px;
+}
+
+/* Social Buttons */
+.social-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--bs-white);
-  border: 1px solid rgba(256, 256, 256, 0.1);
-  border-radius: 35px;
-  transition: 0.3s;
-}
-.footer .btn.btn-social:hover {
-  color: var(--bs-primary);
-  background: var(--bs-white);
-}
-.footer .btn-link {
-  display: block;
-  margin-bottom: 5px;
-  padding: 0;
-  text-align: left;
-  color: rgba(255, 255, 255, 0.5);
-  font-weight: normal;
-  text-transform: capitalize;
-  transition: 0.3s;
   text-decoration: none;
+  transition: all 0.3s ease;
 }
-.footer .btn-link::before {
-  position: relative;
-  content: "\f105";
-  font-family: "Font Awesome 5 Free";
-  font-weight: 900;
-  margin-right: 10px;
+.social-btn:hover {
+  background: #ffffff;
+  color: #ff6b00;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
-.footer .btn-link:hover {
-  letter-spacing: 1px;
+
+/* Form inputs */
+.custom-input {
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: #ffffff !important;
+}
+.custom-input:focus {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: #ffffff;
   box-shadow: none;
-  color: var(--bs-secondary);
 }
-.btn-square {
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.custom-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Dark Subscribe Button - Dùng màu đen/xám đậm để cân bằng màu cam */
+.custom-btn-dark {
+  background-color: #111827;
+  border-color: #111827;
+  color: #ffffff;
+  transition: background-color 0.2s;
+}
+.custom-btn-dark:hover {
+  background-color: #1f2937;
+  color: #ffffff;
+}
+
+.hover-dark:hover {
+  color: #111827 !important;
 }
 </style>
