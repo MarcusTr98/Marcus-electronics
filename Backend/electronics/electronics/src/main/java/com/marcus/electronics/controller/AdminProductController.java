@@ -27,7 +27,6 @@ public class AdminProductController {
 
     @PostMapping("")
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductRequestDTO dto) {
-        // Dùng @Valid để kích hoạt các ràng buộc @NotBlank, @Min trong DTO
         productService.createProduct(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Thêm sản phẩm thành công");
     }

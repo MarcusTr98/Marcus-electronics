@@ -1,10 +1,12 @@
 package com.marcus.electronics.controller;
 
-import com.marcus.electronics.dto.AuthResponse;
 import com.marcus.electronics.dto.LoginRequest;
+import com.marcus.electronics.model.User;
 import com.marcus.electronics.repository.RoleRepository;
 import com.marcus.electronics.repository.UserRepository;
 import com.marcus.electronics.security.JwtTokenProvider;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@RequiredArgsConstructor // Tự động inject bean (thay cho @Autowired)
-@CrossOrigin("*") // Cho phép Frontend gọi vào
+@RequiredArgsConstructor
+@CrossOrigin("*")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -35,26 +37,33 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         try {
-            // 1. Xác thực username/password
+            // 1. Xác thực Username & Password
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getUsername(),
-                            loginRequest.getPassword()));
-
-            // 2. Nếu không có lỗi thì set thông tin vào context
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // 3. Tạo token
-            String jwt = tokenProvider.generateToken(authentication.getName());
-            String role = authentication.getAuthorities().toString();
+            // 2. Lấy thông tin User từ DB để nhồi vào Token
+            User user = userRepository.findByUsername(loginRequest.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User không tồn tại"));
 
-            return ResponseEntity.ok(new AuthResponse(jwt, loginRequest.getUsername(), role));
+            // 3. Gọi hàm generateToken MỚI (truyền đủ 3 tham số)
+            String jwt = tokenProvider.generateToken(user.getUsername(), user.getRole().getName(), user.getId());
 
-        } catch (Exception ex) {
-            // QUAN TRỌNG: Bắt lỗi BadCredentialsException ở đây
-            return ResponseEntity.status(401).body("Đăng nhập thất bại: Sai Username hoặc Password");
+            // 4. Trả về Frontend (Giả sử bạn dùng AuthResponse, hoặc dùng Map)
+            java.util.Map<String, Object> response = new java.util.HashMap<>();
+            response.put("token", jwt);
+            response.put("role", user.getRole().getName());
+            response.put("username", user.getUsername());
+            response.put("fullName", user.getFullName());
+
+            return ResponseEntity.ok(response);
+
+        } catch (org.springframework.security.authentication.BadCredentialsException e) {
+            return ResponseEntity.status(401).body("Sai tên đăng nhập hoặc mật khẩu");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Lỗi server: " + e.getMessage());
         }
     }
 

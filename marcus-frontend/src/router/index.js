@@ -20,7 +20,7 @@ import CustomerManageView from "../views/admin/CustomerManageView.vue";
 import OrderManageView from "../views/admin/OrderManageView.vue";
 
 const routes = [
-  // --- NHÓM TRANG KHÁCH HÀNG (Có Header/Footer) ---
+  // --- NHÓM TRANG KHÁCH HÀNG (Có Header/Footer)
   {
     path: "/",
     component: ClientLayout,
@@ -36,7 +36,7 @@ const routes = [
     ],
   },
 
-  // --- TRANG LOGIN (Không Header/Footer) ---
+  // --- TRANG LOGIN (Không Header/Footer)
   {
     path: "/login",
     name: "login",
@@ -99,8 +99,8 @@ const router = createRouter({
 
 // NAVIGATION GUARD
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("jwt_token");
-  const role = localStorage.getItem("user_role") || "";
+  const token = localStorage.getItem("ACCESS_TOKEN");
+  const role = localStorage.getItem("USER_ROLE") || "";
 
   if (to.path.startsWith("/admin")) {
     if (!token) {

@@ -9,5 +9,5 @@ import lombok.Data;
 public class AuthResponse {
     private String token;
     private String username;
-    private String role; // Trả về role để Frontend biết đường chuyển hướng (Admin/User)
+    private String role;
 }

@@ -26,9 +26,10 @@ const dangNhap = async () => {
       formData.value,
     );
     const { token, role, username } = res.data;
-    localStorage.setItem("jwt_token", token);
-    localStorage.setItem("user_role", role);
-    localStorage.setItem("username", username);
+    localStorage.setItem("ACCESS_TOKEN", token);
+    localStorage.setItem("USER_ROLE", role);
+    localStorage.setItem("USERNAME", username);
+
     role.includes("ADMIN") ? router.push("/admin") : router.push("/");
   } catch (err) {
     thongBaoLoi.value =
@@ -48,7 +49,7 @@ const dangNhap = async () => {
       <p>Đăng nhập để tiếp tục mua sắm nhé</p>
     </div>
 
-    <!-- Đăng nhập nhanh qua mạng xã hội -->
+    <!-- Đăng nhập nhanh qua MXH -->
     <div class="social-btns">
       <button type="button" class="social-btn">
         <svg width="18" height="18" viewBox="0 0 24 24">

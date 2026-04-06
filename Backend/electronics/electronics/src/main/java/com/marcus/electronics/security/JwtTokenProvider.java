@@ -11,25 +11,25 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
     // Khóa bí mật (Chỉ Server biết). Tuyệt đối không lộ ra ngoài.
-    // Đây là chuỗi Base64 ngẫu nhiên (có thể thay đổi sau)
     private final String JWT_SECRET = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
 
     // Thời gian hết hạn của Token (Ví dụ: 86400000 ms = 24 giờ)
     private final long JWT_EXPIRATION = 86400000L;
 
-    // Lấy key ký tên
-    private Key getSignInKey() {
+    public Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(JWT_SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // 1. Tạo Token từ Username
-    public String generateToken(String username) {
+    // 1. Tạo Token
+    public String generateToken(String username, String role, Long userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
 
         return Jwts.builder()
                 .setSubject(username)
+                .claim("role", role)
+                .claim("userId", userId)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
@@ -46,7 +46,7 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
-    // 3. Validate Token (Kiểm tra vé giả/hết hạn)
+    // 3. Validate Token
     public boolean validateToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(authToken);
