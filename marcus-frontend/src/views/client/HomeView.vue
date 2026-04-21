@@ -62,9 +62,12 @@
       </div>
 
       <div class="text-center mt-5" v-if="featuredProducts.length > 0">
-        <a href="#" class="btn btn-primary py-2 px-4 rounded-pill"
-          >Xem tất cả sản phẩm <i class="bi bi-arrow-right ms-2"></i
-        ></a>
+        <router-link
+          to="/products"
+          class="btn btn-primary py-2 px-4 rounded-pill fw-bold shadow-sm"
+        >
+          Xem tất cả sản phẩm <i class="bi bi-arrow-right ms-2"></i>
+        </router-link>
       </div>
     </div>
   </div>

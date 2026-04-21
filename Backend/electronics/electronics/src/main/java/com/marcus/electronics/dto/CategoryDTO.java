@@ -16,13 +16,12 @@ public class CategoryDTO {
 
     private String slug;
 
-    // Frontend cần ID cha để làm logic chọn Select Box trong Modal
-    @JsonProperty("parent_id")
+    @JsonProperty("parentId")
     private Integer parentId;
 
-    // THÊM MỚI: Frontend cần Tên cha để hiển thị lên Bảng
+    @JsonProperty("parentName")
     private String parentName;
 
-    // THÊM MỚI: Frontend cần Trạng thái để hiển thị badge Xanh/Đỏ
+    @JsonProperty("isActive")
     private Boolean active;
 }

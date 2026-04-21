@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import api from "../../utils/api"; // Đã đổi sang dùng api.js để có Interceptor JWT
 
-const API_URL = "http://localhost:8080/api/v1/admin/categories";
+const API_URL = "/admin/categories"; // Rút gọn URL vì api.js đã cấu hình baseURL
 const categories = ref([]);
 const isLoading = ref(false);
 const showModal = ref(false);
@@ -11,16 +11,19 @@ const editingId = ref(null);
 const currentPage = 1;
 const pageSize = 10;
 
+// SỬA LỖI TẠI ĐÂY: Khởi tạo biến parentId chuẩn
 const form = ref({ name: "", parentId: null });
 
 const fetchCategories = async () => {
   isLoading.value = true;
   try {
-    const res = await axios.get(API_URL);
+    const res = await api.get(API_URL);
     categories.value = res.data;
-    console.log("DỮ LIỆU THỰC TẾ TỪ BACKEND:", categories.value); // LUÔN LOG ĐỂ KIỂM TRA
   } catch (error) {
-    console.error(error);
+    console.error("Lỗi tải danh mục:", error);
+    if (error.response?.status === 403) {
+      alert("Bạn không có quyền truy cập trang này!");
+    }
   } finally {
     isLoading.value = false;
   }
@@ -34,12 +37,14 @@ const getParentName = (parentId) => {
 
 const openAddModal = () => {
   editingId.value = null;
+  // SỬA LỖI TẠI ĐÂY
   form.value = { name: "", parentId: null };
   showModal.value = true;
 };
 
 const editCategory = (cat) => {
   editingId.value = cat.id;
+  // Đồng bộ hóa các trường hợp backend trả về
   form.value = { name: cat.name, parentId: cat.parentId || cat.parent_id };
   showModal.value = true;
 };
@@ -50,42 +55,47 @@ const saveCategory = async () => {
   // Payload chuẩn camelCase
   const payload = {
     name: form.value.name,
-    parentId: form.value.parentId,
+    parentId: form.value.parentId, // Đã khớp biến
   };
 
   try {
     if (editingId.value) {
-      await axios.put(`${API_URL}/${editingId.value}`, payload);
+      await api.put(`${API_URL}/${editingId.value}`, payload);
     } else {
-      await axios.post(API_URL, payload);
+      await api.post(API_URL, payload);
     }
     showModal.value = false;
-    await fetchCategories();
-    alert("Thành công!");
+    await fetchCategories(); // Tải lại danh sách
+    alert("Lưu danh mục thành công!");
   } catch (err) {
-    const errorMsg = err.response?.data?.message || "Lỗi hệ thống";
+    const errorMsg =
+      err.response?.data?.message || err.response?.data || "Lỗi hệ thống";
     alert("Lỗi: " + errorMsg);
   }
 };
 
 const confirmDelete = async (id) => {
-  if (confirm("Xóa (ẩn) danh mục này?")) {
+  if (confirm("Bạn có chắc muốn ẩn danh mục này?")) {
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await api.delete(`${API_URL}/${id}`);
       fetchCategories();
     } catch (err) {
-      alert("Lỗi khi xóa!");
+      alert(
+        "Lỗi khi ẩn danh mục! Vui lòng kiểm tra xem danh mục này còn chứa sản phẩm không.",
+      );
     }
   }
 };
 
 const confirmRestore = async (id) => {
-  if (confirm("Khôi phục (hiển thị lại) danh mục này?")) {
+  if (confirm("Khôi phục hiển thị danh mục này?")) {
     try {
-      await axios.put(`${API_URL}/${id}/restore`);
+      // Giả sử Backend có cấu hình API PUT /admin/categories/{id}/restore
+      // Nếu API của bạn đang là PATCH hoặc dạng khác, hãy sửa đổi dòng dưới cho khớp
+      await api.put(`${API_URL}/${id}/restore`);
       await fetchCategories();
     } catch (err) {
-      alert("Lỗi khi khôi phục!");
+      alert("Lỗi khi khôi phục danh mục!");
     }
   }
 };
@@ -99,76 +109,96 @@ onMounted(() => fetchCategories());
       <div class="page-title-row">
         <div>
           <h3 class="page-title-text">Quản lý danh mục</h3>
-          <p class="page-subtitle">Thêm, sửa, xóa cấu trúc phân cấp danh mục</p>
+          <p class="page-subtitle">Thêm, sửa, ẩn cấu trúc phân cấp danh mục</p>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-header-custom">
-        <h6 class="card-title-text">Cây danh mục</h6>
+      <div
+        class="card-header-custom d-flex justify-content-between align-items-center p-3"
+      >
+        <h6 class="card-title-text m-0">Cây danh mục</h6>
         <button class="btn-add" @click="openAddModal">
           <i class="bi bi-plus-lg"></i> Thêm danh mục
         </button>
       </div>
 
-      <div class="table-responsive">
-        <table class="data-table">
-          <thead>
+      <div class="table-responsive p-3">
+        <table class="table table-hover align-middle border">
+          <thead class="table-light">
             <tr>
-              <th>STT</th>
+              <th class="text-center">STT</th>
               <th>Tên danh mục</th>
-              <th>Slug</th>
-              <th>Cấp bậc (Parent)</th>
-              <th>Trạng thái</th>
-              <th>Hành động</th>
+              <th>Đường dẫn (Slug)</th>
+              <th>Thuộc danh mục</th>
+              <th class="text-center">Trạng thái</th>
+              <th class="text-center">Hành động</th>
             </tr>
           </thead>
           <tbody>
             <template v-if="isLoading">
               <tr>
-                <td colspan="6" class="text-center py-4">Đang tải...</td>
+                <td colspan="6" class="text-center py-5">
+                  <div class="spinner-border text-primary" role="status"></div>
+                </td>
               </tr>
             </template>
 
             <template v-else-if="categories.length === 0">
               <tr>
-                <td colspan="6" class="text-center py-4">Trống.</td>
+                <td colspan="6" class="text-center py-5 text-muted">
+                  Chưa có danh mục nào.
+                </td>
               </tr>
             </template>
 
             <template v-else>
               <tr v-for="(cat, index) in categories" :key="cat.id">
-                <td class="text-center fw-bold">
+                <td class="text-center fw-bold text-secondary">
                   {{ (currentPage - 1) * pageSize + index + 1 }}
                 </td>
                 <td class="fw-bold text-dark">{{ cat.name }}</td>
-                <td class="text-muted">{{ cat.slug }}</td>
-                <td class="fw-bold">
+                <td>
+                  <code class="text-muted bg-light px-2 py-1 rounded">{{
+                    cat.slug
+                  }}</code>
+                </td>
+                <td class="fw-semibold">
                   <span
-                    v-if="getParentName(cat.parentId || cat.parent_id)"
-                    class="text-secondary"
+                    v-if="cat.parentId || cat.parent_id"
+                    class="badge bg-info text-dark border"
                   >
-                    Con của: {{ getParentName(cat.parentId || cat.parent_id) }}
+                    <i class="bi bi-diagram-2 me-1"></i>
+                    {{ getParentName(cat.parentId || cat.parent_id) }}
                   </span>
-                  <span v-else class="text-success">Danh mục gốc</span>
+                  <span v-else class="badge bg-secondary text-white">
+                    <i class="bi bi-folder me-1"></i> Danh mục gốc
+                  </span>
                 </td>
 
-                <td class="fw-bold">
-                  <span v-if="cat.active || cat.isActive" class="text-success"
-                    >Hiển thị</span
+                <td class="text-center">
+                  <span
+                    v-if="cat.active || cat.isActive"
+                    class="badge bg-success"
+                    >Đang hiển thị</span
                   >
-                  <span v-else class="text-muted">Đang ẩn</span>
+                  <span v-else class="badge bg-danger">Đang ẩn</span>
                 </td>
-                <td>
-                  <div class="action-btns">
-                    <button class="action-btn edit" @click="editCategory(cat)">
+
+                <td class="text-center">
+                  <div class="d-flex justify-content-center gap-2">
+                    <button
+                      class="btn btn-sm btn-outline-primary"
+                      @click="editCategory(cat)"
+                      title="Chỉnh sửa"
+                    >
                       <i class="bi bi-pencil"></i>
                     </button>
 
                     <button
-                      v-if="cat.active"
-                      class="action-btn delete"
+                      v-if="cat.active || cat.isActive"
+                      class="btn btn-sm btn-outline-danger"
                       @click="confirmDelete(cat.id)"
                       title="Ẩn danh mục"
                     >
@@ -177,8 +207,7 @@ onMounted(() => fetchCategories());
 
                     <button
                       v-else
-                      class="action-btn edit"
-                      style="background-color: #198754; color: white"
+                      class="btn btn-sm btn-success"
                       @click="confirmRestore(cat.id)"
                       title="Khôi phục hiển thị"
                     >
@@ -194,41 +223,50 @@ onMounted(() => fetchCategories());
     </div>
 
     <div class="modal-overlay" v-if="showModal" @click.self="showModal = false">
-      <div class="modal-box modal-sm">
-        <div class="modal-header-custom">
-          <h5>{{ editingId ? "Sửa danh mục" : "Thêm danh mục mới" }}</h5>
-          <button class="modal-close" @click="showModal = false">
-            <i class="bi bi-x-lg"></i>
-          </button>
+      <div class="modal-box" style="max-width: 400px">
+        <div
+          class="modal-header-custom d-flex justify-content-between align-items-center p-3 border-bottom"
+        >
+          <h5 class="m-0 fw-bold">
+            {{ editingId ? "Chỉnh sửa danh mục" : "Thêm danh mục mới" }}
+          </h5>
+          <button class="btn-close" @click="showModal = false"></button>
         </div>
-        <div class="modal-body-custom">
-          <div class="form-group-custom mb-3">
-            <label>Tên danh mục *</label>
+
+        <div class="modal-body-custom p-4">
+          <div class="mb-4">
+            <label class="form-label fw-bold small text-muted text-uppercase"
+              >Tên danh mục <span class="text-danger">*</span></label
+            >
             <input
               v-model="form.name"
               type="text"
+              class="form-control"
               placeholder="Ví dụ: Laptop Gaming"
             />
           </div>
-          <div class="form-group-custom">
-            <label>Thuộc danh mục cha</label>
-            <select v-model="form.parent_id">
-              <option :value="null">-- Không có (Làm danh mục gốc) --</option>
-              <option
-                v-for="c in categories"
-                :key="c.id"
-                :value="c.id"
-                :disabled="c.id === editingId"
-              >
-                {{ c.name }}
-              </option>
+
+          <div>
+            <label class="form-label fw-bold small text-muted text-uppercase"
+              >Danh mục cha</label
+            >
+            <select v-model="form.parentId" class="form-select">
+              <option :value="null">-- Trống (Làm danh mục gốc) --</option>
+              <template v-for="c in categories" :key="c.id">
+                <option v-if="c.id !== editingId" :value="c.id">
+                  {{ c.name }}
+                </option>
+              </template>
             </select>
           </div>
         </div>
-        <div class="modal-footer-custom">
+
+        <div
+          class="modal-footer-custom p-3 border-top d-flex justify-content-end gap-2"
+        >
           <button class="btn-cancel" @click="showModal = false">Hủy</button>
           <button class="btn-save" @click="saveCategory">
-            <i class="bi bi-check-lg"></i> Lưu
+            <i class="bi bi-check-lg me-1"></i> Lưu lại
           </button>
         </div>
       </div>
@@ -238,4 +276,23 @@ onMounted(() => fetchCategories());
 
 <style scoped>
 @import "../../assets/css/product-manage.css";
+/* Overlay Modal chung */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
 </style>

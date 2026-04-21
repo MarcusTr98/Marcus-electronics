@@ -212,25 +212,25 @@ onMounted(getProductDetail);
               style="height: 46px"
             >
               <button
-                class="btn border-0 px-3 text-black fw-bold"
+                class="btn border-0 px-3 text-dark fw-bold"
                 @click="decreaseQty"
                 :disabled="quantity <= 1"
               >
-                <i class="bi bi-dash-lg"></i>
+                -
               </button>
               <input
                 type="text"
-                class="form-control border-0 text-center fw-bold p-0 text-black"
+                class="form-control border-0 text-center fw-bold p-0 text-dark"
                 v-model="quantity"
                 readonly
                 style="width: 35px; background: none"
               />
               <button
-                class="btn border-0 px-3 text-black fw-bold"
+                class="btn border-0 px-3 text-dark fw-bold"
                 @click="increaseQty"
                 :disabled="quantity >= displayStock"
               >
-                <i class="bi bi-plus-lg"></i>
+                +
               </button>
             </div>
 

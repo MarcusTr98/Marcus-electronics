@@ -19,6 +19,9 @@ import ProductVariantDetail from "../views/admin/ProductVariantDetail.vue";
 import CustomerManageView from "../views/admin/CustomerManageView.vue";
 import OrderManageView from "../views/admin/OrderManageView.vue";
 
+import OrderSuccessView from "../views/client/OrderSuccessView.vue";
+import AllProductsView from "../views/client/AllProductsView.vue";
+
 const routes = [
   // --- NHÓM TRANG KHÁCH HÀNG (Có Header/Footer)
   {
@@ -28,6 +31,12 @@ const routes = [
       { path: "", name: "home", component: HomeView },
       { path: "cart", name: "cart", component: CartView },
       { path: "checkout", name: "checkout", component: CheckoutView },
+      {
+        path: "order-success",
+        name: "order-success",
+        component: OrderSuccessView,
+      },
+      { path: "products", name: "products", component: AllProductsView },
       {
         path: "product/:slug",
         name: "product-detail",

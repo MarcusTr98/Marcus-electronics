@@ -164,14 +164,11 @@ const handleLogout = () => {
             <!-- Hệ thống -->
             <li class="sidebar-title">Hệ thống</li>
 
-            <li
-              class="sidebar-item"
-              :class="{ active: $route.path === '/admin/users' }"
-            >
-              <router-link to="/admin/users" class="sidebar-link">
+            <li class="sidebar-item">
+              <a href="#" class="sidebar-link" @click.prevent>
                 <i class="bi bi-person-badge-fill"></i>
-                <span>Quản trị viên</span>
-              </router-link>
+                <span>Quản trị viên (Đang phát triển)</span>
+              </a>
             </li>
 
             <li class="sidebar-item">

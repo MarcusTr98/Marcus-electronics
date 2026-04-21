@@ -32,30 +32,51 @@ const removeOption = (index) => {
 };
 
 // ==================== UTILS ====================
-const getInitials = (str) =>
-  str
+
+// 1. Hàm tạo mã tiền tố Sản phẩm (VD: Samsung Galaxy S24 Ultra 5G -> SGS24U5)
+const getInitials = (str) => {
+  // Loại bỏ dấu tiếng Việt và ký tự đặc biệt (giữ lại chữ và số)
+  const cleanStr = str
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[đĐ]/g, "d")
-    .split(" ")
-    .filter((word) => word.length > 0)
-    .map((word) => word[0])
-    .join("")
+    .replace(/[^a-zA-Z0-9 ]/g, "")
     .toUpperCase();
 
+  const words = cleanStr.split(" ").filter((word) => word.length > 0);
+
+  let prefix = "";
+  words.forEach((word) => {
+    // Nếu từ là một con số hoặc chứa con số (VD: 24, S24, 5G, M3), giữ nguyên cả cụm đó (tối đa 4 ký tự)
+    if (/\d/.test(word)) {
+      prefix += word.substring(0, 4);
+    } else {
+      // Nếu chỉ là chữ (VD: Samsung, Ultra), lấy chữ cái đầu
+      prefix += word[0];
+    }
+  });
+
+  return prefix;
+};
+
+// 2. Hàm tạo mã Hậu tố Biến thể (VD: 256GB -> 256G, Titan Xanh -> TX)
 const generateValueCode = (val) => {
   const cleanStr = val
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[đĐ]/g, "d");
+    .replace(/[đĐ]/g, "d")
+    .replace(/[^a-zA-Z0-9 ]/g, "")
+    .toUpperCase();
+
   const words = cleanStr.split(" ").filter((w) => w.length > 0);
 
-  return words.length === 1
-    ? words[0].toUpperCase().substring(0, 4)
-    : words
-        .map((w) => w[0])
-        .join("")
-        .toUpperCase();
+  // Nếu giá trị chỉ có 1 từ và chứa số (VD: 256GB), lấy nguyên chữ/số đó (tối đa 5 ký tự)
+  if (words.length === 1 && /\d/.test(words[0])) {
+    return words[0].substring(0, 5);
+  }
+
+  // Nếu có nhiều từ (VD: Xanh Ngọc, Titan Đen), lấy chữ cái đầu của mỗi từ
+  return words.map((w) => w[0]).join("");
 };
 
 const cartesian = (args) =>

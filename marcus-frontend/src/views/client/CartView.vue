@@ -1,17 +1,19 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const cartItems = ref([]);
 
-// 1. Load giỏ hàng từ LocalStorage khi vào trang
-onMounted(() => {
+// 1. Load giỏ hàng từ LocalStorage
+const loadCart = () => {
   const savedCart = localStorage.getItem("marcus_cart");
   if (savedCart) {
     cartItems.value = JSON.parse(savedCart);
   }
-});
+};
 
-// 2. Tính tổng tiền
+// 2. Tính toán tiền nong
 const totalAmount = computed(() => {
   return cartItems.value.reduce(
     (total, item) => total + item.price * item.quantity,
@@ -19,148 +21,139 @@ const totalAmount = computed(() => {
   );
 });
 
-// 3. Hàm cập nhật LocalStorage khi có thay đổi (xóa, tăng giảm sl)
-const updateCart = () => {
+// 3. Cập nhật LocalStorage & Bắn sự kiện cho Header
+const syncCart = () => {
   localStorage.setItem("marcus_cart", JSON.stringify(cartItems.value));
+  window.dispatchEvent(new Event("cart-updated"));
 };
 
-// 4. Xóa sản phẩm
 const removeItem = (index) => {
-  if (confirm("Bạn có chắc muốn xóa không?")) {
+  if (confirm("Xóa sản phẩm này khỏi giỏ hàng?")) {
     cartItems.value.splice(index, 1);
-    updateCart();
+    syncCart();
   }
 };
 
-// 5. Tăng giảm số lượng
-const decreaseQty = (index) => {
-  if (cartItems.value[index].quantity > 1) {
-    cartItems.value[index].quantity--;
-    updateCart();
+const updateQty = (index, delta) => {
+  const item = cartItems.value[index];
+  const newQty = item.quantity + delta;
+  if (newQty >= 1 && newQty <= 10) {
+    // Giới hạn mua tối đa 10
+    item.quantity = newQty;
+    syncCart();
   }
 };
-const increaseQty = (index) => {
-  cartItems.value[index].quantity++;
-  updateCart();
-};
+
+const formatCurrency = (val) =>
+  new Intl.NumberFormat("vi-VN").format(val) + " ₫";
+
+onMounted(loadCart);
 </script>
 
 <template>
-  <div class="container-fluid py-5 mt-5">
-    <div class="container py-5">
-      <h3 class="mb-4 text-primary fw-bold">Giỏ hàng của bạn</h3>
-
-      <div v-if="cartItems.length === 0" class="text-center py-5">
-        <p class="fs-5 text-dark">Giỏ hàng đang trống trơn!</p>
-        <router-link to="/" class="btn btn-primary rounded-pill px-5"
-          >Đi mua sắm ngay</router-link
-        >
-      </div>
-
-      <div v-else>
-        <div class="table-responsive">
-          <table class="table">
-            <thead>
-              <tr class="text-center">
-                <th scope="col">Sản phẩm</th>
-                <th scope="col">Tên</th>
-                <th scope="col">Giá</th>
-                <th scope="col">Số lượng</th>
-                <th scope="col">Thành tiền</th>
-                <th scope="col">Xóa</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(item, index) in cartItems"
-                :key="item.id"
-                class="align-middle text-center"
-              >
-                <th scope="row">
-                  <div class="d-flex align-items-center justify-content-center">
-                    <img
-                      :src="item.thumbnail"
-                      class="img-fluid rounded"
-                      style="width: 80px"
-                      alt=""
-                    />
-                  </div>
-                </th>
-                <td>
-                  <p class="mb-0 fw-bold">{{ item.name }}</p>
-                </td>
-                <td>
-                  <p class="mb-0 text-secondary">
-                    {{ item.price.toLocaleString("vi-VN") }} ₫
-                  </p>
-                </td>
-                <td>
-                  <div
-                    class="input-group quantity mx-auto"
-                    style="width: 100px"
-                  >
-                    <div class="input-group-btn">
-                      <button
-                        class="btn btn-sm btn-minus rounded-circle bg-light border"
-                        @click="decreaseQty(index)"
-                      >
-                        <i class="fa fa-minus"></i>
-                      </button>
-                    </div>
-                    <input
-                      type="text"
-                      class="form-control form-control-sm text-center border-0"
-                      :value="item.quantity"
-                      readonly
-                    />
-                    <div class="input-group-btn">
-                      <button
-                        class="btn btn-sm btn-plus rounded-circle bg-light border"
-                        @click="increaseQty(index)"
-                      >
-                        <i class="fa fa-plus"></i>
-                      </button>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <p class="mb-0 fw-bold text-primary">
-                    {{ (item.price * item.quantity).toLocaleString("vi-VN") }} ₫
-                  </p>
-                </td>
-                <td>
-                  <button
-                    class="btn btn-md rounded-circle bg-light border text-danger"
-                    @click="removeItem(index)"
-                  >
-                    <i class="fa fa-times"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+  <div class="container py-5 mt-5">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="fw-bold mb-0">Giỏ hàng của bạn</h3>
+          <span class="text-muted">({{ cartItems.length }} sản phẩm)</span>
         </div>
 
-        <div class="row g-4 justify-content-end mt-4">
-          <div class="col-sm-8 col-md-7 col-lg-6 col-xl-4">
-            <div class="bg-light rounded p-4">
-              <h4 class="mb-4 text-primary">Tổng đơn hàng</h4>
-              <div
-                class="d-flex justify-content-between mb-3 border-bottom pb-2"
-              >
-                <h6 class="mb-0">Tổng tiền hàng:</h6>
-                <p class="mb-0 fw-bold">
-                  {{ totalAmount.toLocaleString("vi-VN") }} ₫
-                </p>
+        <div
+          v-if="cartItems.length === 0"
+          class="text-center py-5 bg-white rounded-4 shadow-sm"
+        >
+          <i class="bi bi-cart-x display-1 text-muted"></i>
+          <p class="fs-5 mt-3">Giỏ hàng đang trống!</p>
+          <router-link to="/" class="btn btn-primary rounded-pill px-5"
+            >Tiếp tục mua sắm</router-link
+          >
+        </div>
+
+        <div v-else class="cart-list d-flex flex-column gap-3">
+          <div
+            v-for="(item, index) in cartItems"
+            :key="item.skuId"
+            class="cart-item bg-white p-3 rounded-4 shadow-sm d-flex align-items-center border"
+          >
+            <img
+              :src="item.thumbnail"
+              class="rounded-3 border"
+              style="width: 100px; height: 100px; object-fit: contain"
+            />
+
+            <div class="ms-4 flex-grow-1">
+              <h5 class="fw-bold mb-1 text-dark">{{ item.name }}</h5>
+              <p class="small text-primary mb-2 fw-semibold">
+                Phân loại:
+                <span class="text-muted">{{ item.variantDetail }}</span>
+              </p>
+              <div class="fw-bold text-danger">
+                {{ formatCurrency(item.price) }}
               </div>
-              <router-link
-                to="/checkout"
-                class="btn btn-success rounded-pill px-4 py-3 text-uppercase w-100 fw-bold"
-              >
-                Tiến hành thanh toán
-              </router-link>
             </div>
+
+            <div
+              class="qty-picker d-flex align-items-center border rounded-3 overflow-hidden me-4"
+              style="height: 38px"
+            >
+              <button
+                class="btn btn-light btn-sm border-0 px-3"
+                @click="updateQty(index, -1)"
+              >
+                -
+              </button>
+              <input
+                type="text"
+                class="form-control form-control-sm border-0 text-center fw-bold p-0"
+                :value="item.quantity"
+                readonly
+                style="width: 35px; background: none"
+              />
+              <button
+                class="btn btn-light btn-sm border-0 px-3"
+                @click="updateQty(index, 1)"
+              >
+                +
+              </button>
+            </div>
+
+            <button
+              class="btn btn-outline-danger border-0 rounded-circle"
+              @click="removeItem(index)"
+            >
+              <i class="bi bi-trash3"></i>
+            </button>
           </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4" v-if="cartItems.length > 0">
+        <div
+          class="card border-0 shadow-sm rounded-4 p-4 sticky-top"
+          style="top: 120px"
+        >
+          <h5 class="fw-bold mb-4">Tóm tắt đơn hàng</h5>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Tạm tính:</span>
+            <span class="fw-bold">{{ formatCurrency(totalAmount) }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-3 border-bottom pb-3">
+            <span>Giao hàng:</span>
+            <span class="text-success fw-bold">Miễn phí</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <span class="fs-5 fw-bold">TỔNG CỘNG:</span>
+            <span class="fs-4 fw-bold text-danger">{{
+              formatCurrency(totalAmount)
+            }}</span>
+          </div>
+          <button
+            @click="router.push('/checkout')"
+            class="btn btn-primary btn-lg w-100 rounded-pill fw-bold py-3 shadow"
+          >
+            TIẾN HÀNH THANH TOÁN
+          </button>
         </div>
       </div>
     </div>
