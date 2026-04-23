@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "payment")
+@Table(name = "payment") // Trong SQL Server, tên bảng là payment
 @Data
 @Builder
 @NoArgsConstructor
@@ -16,17 +16,17 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "orderId", nullable = false)
     private Order order;
 
-    @Column(name = "payment_time")
+    @Column(name = "paymentTime")
     private LocalDateTime paymentTime;
 
     @Column(name = "amount", nullable = false, precision = 18, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "transaction_code", length = 100)
+    @Column(name = "transactionCode", length = 100)
     private String transactionCode;
 
     @Column(name = "status", length = 20, nullable = false)

@@ -41,14 +41,17 @@ const totalAmount = computed(() => {
   );
 });
 
-// 3. Gửi đơn hàng (Linh hồn của trang thanh toán)
+// Thêm state mới
+const paymentMethod = ref("COD");
+
+// Cập nhật hàm placeOrder
 const placeOrder = async () => {
   if (
     !orderData.value.fullName ||
     !orderData.value.phoneNumber ||
     !orderData.value.address
   ) {
-    alert("Vui lòng nhập đầy đủ các thông tin bắt buộc (*)");
+    alert("Vui lòng nhập đầy đủ thông tin bắt buộc (*)");
     return;
   }
 
@@ -59,37 +62,38 @@ const placeOrder = async () => {
       phone_number: orderData.value.phoneNumber,
       address: orderData.value.address,
       note: orderData.value.note,
-      payment_method: "COD",
-
+      payment_method: paymentMethod.value, // Truyền đúng phương thức đã chọn
       cart_items: cartItems.value.map((item) => {
         const rawId = item.skuId || item.id;
-
         const cleanId =
           typeof rawId === "string"
             ? parseInt(rawId.replace("PROD_", ""))
             : rawId;
-
-        return {
-          sku_id: cleanId,
-          quantity: item.quantity,
-        };
+        return { sku_id: cleanId, quantity: item.quantity };
       }),
     };
 
+    // 1. Tạo đơn hàng trước
     const response = await api.post("/orders", payload);
-
     localStorage.removeItem("marcus_cart");
     window.dispatchEvent(new Event("cart-updated"));
 
+    // Lấy Order ID
     const resText = response.data;
     const match = resText.match(/\d+/);
     const orderId = match ? match[0] : "";
 
-    router.push(`/order-success?id=${orderId}`);
+    if (paymentMethod.value === "VNPAY") {
+      // Gọi API lấy Link VNPAY và chuyển hướng khách sang Ngân hàng
+      const vnPayRes = await api.get(`/payment/vnpay/create-url/${orderId}`);
+      window.location.href = vnPayRes.data; // Đá sang trang VNPAY
+    } else {
+      // Nếu là COD, đi thẳng ra trang Cảm ơn
+      router.push(`/order-success?id=${orderId}`);
+    }
   } catch (error) {
     console.error("LỖI ĐẶT HÀNG:", error);
-    const errorMsg = error.response?.data || error.message;
-    alert("Đặt hàng thất bại: " + errorMsg);
+    alert("Đặt hàng thất bại: " + (error.response?.data || error.message));
   } finally {
     loading.value = false;
   }
@@ -220,32 +224,44 @@ const formatCurrency = (val) =>
                 <h6 class="fw-bold small text-muted mb-3">
                   PHƯƠNG THỨC THANH TOÁN
                 </h6>
-                <div class="form-check border p-3 rounded-3 bg-white mb-2">
-                  <input
-                    class="form-check-input ms-0"
-                    type="radio"
-                    checked
-                    id="codMethod"
-                  />
-                  <label class="form-check-label ms-2 fw-bold" for="codMethod">
-                    Thanh toán khi nhận hàng (COD)
-                  </label>
-                </div>
+
                 <div
-                  class="form-check border p-3 rounded-3 bg-light opacity-50"
+                  class="form-check border p-3 rounded-3 bg-white mb-2 cursor-pointer"
+                  @click="paymentMethod = 'COD'"
                 >
                   <input
                     class="form-check-input ms-0"
                     type="radio"
-                    disabled
+                    value="COD"
+                    v-model="paymentMethod"
+                    id="codMethod"
+                  />
+                  <label class="form-check-label ms-2 fw-bold" for="codMethod"
+                    >Thanh toán khi nhận hàng (COD)</label
+                  >
+                </div>
+
+                <div
+                  class="form-check border p-3 rounded-3 bg-white cursor-pointer"
+                  @click="paymentMethod = 'VNPAY'"
+                >
+                  <input
+                    class="form-check-input ms-0"
+                    type="radio"
+                    value="VNPAY"
+                    v-model="paymentMethod"
                     id="vnpayMethod"
                   />
-                  <label
-                    class="form-check-label ms-2 fw-bold"
-                    for="vnpayMethod"
-                  >
-                    VNPay / Chuyển khoản (Đang bảo trì)
-                  </label>
+                  <div class="ms-2 d-inline-block">
+                    <label
+                      class="form-check-label fw-bold d-block"
+                      for="vnpayMethod"
+                      >Thanh toán qua VNPAY</label
+                    >
+                    <span class="small text-muted"
+                      >Hỗ trợ ATM, Visa, MasterCard, QR Code</span
+                    >
+                  </div>
                 </div>
               </div>
 
