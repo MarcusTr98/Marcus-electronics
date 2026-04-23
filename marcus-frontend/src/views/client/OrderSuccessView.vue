@@ -2,7 +2,6 @@
 import { useRoute } from "vue-router";
 
 const route = useRoute();
-// Lấy mã đơn hàng từ query URL (ví dụ: ?id=15)
 const orderId = route.query.id || "N/A";
 </script>
 
@@ -38,7 +37,7 @@ const orderId = route.query.id || "N/A";
 
           <div class="d-flex justify-content-center gap-3">
             <router-link
-              to="/orders"
+              to="/my-orders"
               class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold"
             >
               Theo dõi đơn hàng

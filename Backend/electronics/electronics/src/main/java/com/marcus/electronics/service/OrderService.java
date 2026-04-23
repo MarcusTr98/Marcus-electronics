@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-
+import java.util.stream.Collectors;
 import java.math.BigDecimal;
 
 @Service
@@ -21,50 +21,49 @@ public class OrderService {
     private final SkuRepository skuRepository;
     private final UserRepository userRepository;
 
-    @Transactional // Quan trọng: Nếu lỗi ở bước nào, Rollback lại hết (không trừ kho bậy)
-    public Order createOrder(OrderRequestDTO requestDTO) {
+    @Transactional
+    public Order createOrder(OrderRequestDTO requestDTO, Long userId) {
+        // Tìm User nếu khách đã đăng nhập
+        User user = null;
+        if (userId != null) {
+            user = userRepository.findById(userId).orElse(null);
+        }
 
         // 1. Tạo Order cha trước
         Order order = Order.builder()
+                .user(user) // SỬA LỖI: Gán User vào đơn hàng để lưu lịch sử
                 .fullName(requestDTO.getFullName())
                 .phoneNumber(requestDTO.getPhoneNumber())
                 .address(requestDTO.getAddress())
                 .note(requestDTO.getNote())
                 .paymentMethod(requestDTO.getPaymentMethod())
                 .status("PENDING")
-                .totalMoney(BigDecimal.ZERO) // Tính sau
+                .totalMoney(BigDecimal.ZERO)
                 .build();
 
-        // Save tạm để lấy ID
         Order savedOrder = orderRepository.save(order);
-
         BigDecimal grandTotal = BigDecimal.ZERO;
 
         // 2. Duyệt qua từng món trong giỏ hàng
         for (OrderRequestDTO.CartItemDTO item : requestDTO.getCartItems()) {
-
-            // Tìm SKU trong kho
             Sku sku = skuRepository.findById(item.getSkuId())
                     .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
 
-            // CHECK TỒN KHO
             if (sku.getStock() < item.getQuantity()) {
                 throw new RuntimeException("Sản phẩm " + sku.getSkuCode() + " không đủ hàng!");
             }
 
-            // TRỪ KHO (Cập nhật lại kho)
+            // Trừ kho
             sku.setStock(sku.getStock() - item.getQuantity());
             skuRepository.save(sku);
 
-            // Tính tiền: Giá lúc mua * Số lượng
             BigDecimal itemTotal = sku.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
             grandTotal = grandTotal.add(itemTotal);
 
-            // Tạo OrderDetail (Lưu vết giá snapshot)
             OrderDetail detail = OrderDetail.builder()
                     .order(savedOrder)
                     .sku(sku)
-                    .price(sku.getPrice()) // QUAN TRỌNG: Lưu giá hiện tại vào đây
+                    .price(sku.getPrice())
                     .numberOfProducts(item.getQuantity())
                     .totalMoney(itemTotal)
                     .build();
@@ -72,16 +71,16 @@ public class OrderService {
             orderDetailRepository.save(detail);
         }
 
-        // 3. Update lại tổng tiền cho Order cha
+        // 3. Update lại tổng tiền
         savedOrder.setTotalMoney(grandTotal);
         return orderRepository.save(savedOrder);
     }
 
+    // ==========================================
     // PHẦN ADMIN: QUẢN LÝ ĐƠN HÀNG
-
+    // ==========================================
     @Transactional(readOnly = true)
     public List<OrderResponseDTO> getAllOrdersForAdmin() {
-        // Lấy tất cả đơn hàng, sắp xếp mới nhất lên đầu
         List<Order> orders = orderRepository.findAll(org.springframework.data.domain.Sort
                 .by(org.springframework.data.domain.Sort.Direction.DESC, "orderDate"));
 
@@ -104,27 +103,19 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
-        // LOGIC HOÀN KHO (RESTOCK):
-        // Chỉ hoàn kho khi trạng thái mới là CANCELLED và trạng thái cũ chưa phải là
-        // CANCELLED
         if ("CANCELLED".equals(newStatus) && !"CANCELLED".equals(order.getStatus())) {
             List<OrderDetail> details = orderDetailRepository.findByOrderId(orderId);
             for (OrderDetail detail : details) {
                 Sku sku = detail.getSku();
-                // Cộng lại số lượng đã trừ
                 sku.setStock(sku.getStock() + detail.getNumberOfProducts());
                 skuRepository.save(sku);
             }
-        }
-        // Nếu chuyển từ CANCELLED sang trạng thái khác (Admin phục hồi đơn) -> Phải trừ
-        // kho lại
-        else if (!"CANCELLED".equals(newStatus) && "CANCELLED".equals(order.getStatus())) {
+        } else if (!"CANCELLED".equals(newStatus) && "CANCELLED".equals(order.getStatus())) {
             List<OrderDetail> details = orderDetailRepository.findByOrderId(orderId);
             for (OrderDetail detail : details) {
                 Sku sku = detail.getSku();
                 if (sku.getStock() < detail.getNumberOfProducts()) {
-                    throw new RuntimeException(
-                            "Không thể phục hồi đơn! Mã SKU " + sku.getSkuCode() + " đã hết hàng trong kho.");
+                    throw new RuntimeException("Mã SKU " + sku.getSkuCode() + " đã hết hàng.");
                 }
                 sku.setStock(sku.getStock() - detail.getNumberOfProducts());
                 skuRepository.save(sku);
@@ -135,13 +126,11 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    // Lấy chi tiết ruột đơn hàng cho Admin
     @Transactional(readOnly = true)
     public List<OrderDetailResponseDTO> getOrderDetailsAdmin(Long orderId) {
         List<OrderDetail> details = orderDetailRepository.findByOrderId(orderId);
 
         return details.stream().map(d -> {
-            // Nối chuỗi cấu hình biến thể (Ví dụ: Màu sắc: Đen | Dung lượng: 128GB)
             String variantInfo = "";
             if (d.getSku().getSkuValues() != null && !d.getSku().getSkuValues().isEmpty()) {
                 variantInfo = d.getSku().getSkuValues().stream()
@@ -149,7 +138,6 @@ public class OrderService {
                         .collect(java.util.stream.Collectors.joining(" | "));
             }
 
-            // Ưu tiên lấy ảnh của SKU, nếu SKU không có ảnh thì lấy ảnh của Product
             String imgUrl = d.getSku().getImageUrl();
             if (imgUrl == null || imgUrl.isEmpty()) {
                 imgUrl = d.getSku().getProduct().getThumbnailUrl();
@@ -162,9 +150,54 @@ public class OrderService {
                     .variantDetail(variantInfo)
                     .imageUrl(imgUrl)
                     .quantity(d.getNumberOfProducts())
-                    .unitPrice(d.getPrice()) // Lấy giá từ bảng OrderDetail (giá lịch sử)
+                    .unitPrice(d.getPrice())
                     .lineTotal(d.getTotalMoney())
                     .build();
         }).collect(java.util.stream.Collectors.toList());
+    }
+
+    // ==========================================
+    // PHẦN CLIENT: LỊCH SỬ MUA HÀNG
+    // ==========================================
+    @Transactional(readOnly = true)
+    public List<OrderResponseDTO> getOrdersByUserId(Long userId) {
+        List<Order> orders = orderRepository.findByUserId(userId);
+        orders.sort((o1, o2) -> o2.getOrderDate().compareTo(o1.getOrderDate()));
+
+        return orders.stream().map(o -> OrderResponseDTO.builder()
+                .id(o.getId())
+                .fullName(o.getFullName())
+                .phoneNumber(o.getPhoneNumber())
+                .address(o.getAddress())
+                .orderDate(o.getOrderDate())
+                .status(o.getStatus())
+                .totalMoney(o.getTotalMoney())
+                .paymentMethod(o.getPaymentMethod())
+                .build()).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void cancelOrderByClient(Long orderId, Long userId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+
+        if (order.getUser() == null || !order.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Bạn không có quyền hủy đơn hàng này");
+        }
+
+        if (!"PENDING".equals(order.getStatus())) {
+            throw new RuntimeException("Đơn hàng đã được xử lý, không thể tự hủy. Vui lòng liên hệ tổng đài.");
+        }
+
+        order.setStatus("CANCELLED");
+
+        List<OrderDetail> details = orderDetailRepository.findByOrderId(orderId);
+        for (OrderDetail detail : details) {
+            Sku sku = detail.getSku();
+            sku.setStock(sku.getStock() + detail.getNumberOfProducts()); // Hoàn kho
+            skuRepository.save(sku);
+        }
+
+        orderRepository.save(order);
     }
 }

@@ -8,6 +8,8 @@ import CartView from "../views/client/CartView.vue";
 import CheckoutView from "../views/client/CheckoutView.vue";
 import ProductDetail from "../views/client/ProductDetail.vue";
 import LoginView from "../views/auth/LoginView.vue";
+import ProfileView from "../views/client/ProfileView.vue";
+import MyOrdersView from "../views/client/MyOrdersView.vue";
 
 // Quản trị viên
 import DashboardView from "../views/admin/DashboardView.vue";
@@ -42,6 +44,8 @@ const routes = [
         name: "product-detail",
         component: ProductDetail,
       },
+      { path: "profile", name: "profile", component: ProfileView },
+      { path: "my-orders", name: "my-orders", component: MyOrdersView },
     ],
   },
 

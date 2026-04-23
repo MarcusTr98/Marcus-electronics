@@ -2,6 +2,8 @@ package com.marcus.electronics.dto;
 
 import lombok.Builder;
 import lombok.Data;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,4 +16,6 @@ public class CustomerResponseDTO {
     private String phoneNumber;
     private Boolean isActive;
     private LocalDateTime createdAt;
+    private Integer totalOrders;
+    private BigDecimal totalSpent;
 }

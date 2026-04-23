@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
-import api from "../../utils/api"; // QUAN TRỌNG: Dùng api.js để có Interceptor JWT
+import api from "../../utils/api";
 
 const router = useRouter();
 const cartItems = ref([]);
@@ -43,7 +43,6 @@ const totalAmount = computed(() => {
 
 // 3. Gửi đơn hàng (Linh hồn của trang thanh toán)
 const placeOrder = async () => {
-  // Validation nhẹ phía Frontend
   if (
     !orderData.value.fullName ||
     !orderData.value.phoneNumber ||
@@ -61,31 +60,36 @@ const placeOrder = async () => {
       address: orderData.value.address,
       note: orderData.value.note,
       payment_method: "COD",
+
       cart_items: cartItems.value.map((item) => {
+        const rawId = item.skuId || item.id;
+
         const cleanId =
-          typeof item.skuId === "string"
-            ? parseInt(item.skuId.replace("PROD_", ""))
-            : item.skuId;
-        return { sku_id: cleanId, quantity: item.quantity };
+          typeof rawId === "string"
+            ? parseInt(rawId.replace("PROD_", ""))
+            : rawId;
+
+        return {
+          sku_id: cleanId,
+          quantity: item.quantity,
+        };
       }),
     };
 
-    const response = await api.post("/order", payload);
+    const response = await api.post("/orders", payload);
 
-    // 1. Dọn dẹp giỏ hàng
     localStorage.removeItem("marcus_cart");
     window.dispatchEvent(new Event("cart-updated"));
 
-    // 2. Bóc tách Mã đơn hàng từ chuỗi Backend trả về (Ví dụ lấy số 15)
     const resText = response.data;
     const match = resText.match(/\d+/);
     const orderId = match ? match[0] : "";
 
-    // 3. Chuyển hướng sang trang Thành công kèm ID
     router.push(`/order-success?id=${orderId}`);
   } catch (error) {
     console.error("LỖI ĐẶT HÀNG:", error);
-    alert("Đặt hàng thất bại: " + (error.response?.data || error.message));
+    const errorMsg = error.response?.data || error.message;
+    alert("Đặt hàng thất bại: " + errorMsg);
   } finally {
     loading.value = false;
   }

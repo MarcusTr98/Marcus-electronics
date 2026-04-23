@@ -276,7 +276,6 @@ onMounted(() => fetchCategories());
 
 <style scoped>
 @import "../../assets/css/product-manage.css";
-/* Overlay Modal chung */
 .modal-overlay {
   position: fixed;
   top: 0;
