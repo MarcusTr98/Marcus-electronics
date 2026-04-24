@@ -1,7 +1,9 @@
 package com.marcus.electronics.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -9,26 +11,30 @@ import java.util.Map;
 @Data
 @Builder
 public class DashboardResponseDTO {
-    // KPI Cards
     private BigDecimal totalRevenue;
-    private Long totalOrders;
-    private Long newCustomers;
-    private Long lowStockSkus;
+    private Double revenueTrend;
+    private Integer totalOrders;
+    private Double orderTrend;
+    private Integer newCustomers;
+    private Double customerTrend;
+    private Integer lowStockSkus;
 
-    // Charts Data
-    private Map<String, BigDecimal> revenueByDay; // Chart Doanh thu 7 ngày qua
-    private Map<String, Long> orderStatusRatio; // Chart Tỷ lệ trạng thái đơn hàng
+    private Map<String, BigDecimal> revenueByDay;
+    private Map<String, Integer> ordersByDay;
+    private Map<String, Integer> orderStatusRatio;
 
-    // Lists
+    private Map<String, TopProductDTO> topProducts;
+
+    private Map<String, Integer> completionByDay;
+    private Map<String, Integer> cancellationByDay;
     private List<OrderResponseDTO> recentOrders;
-    private List<TopProductDTO> topProducts;
 
+    // INNER CLASS: Đóng gói dữ liệu Top Sản phẩm
     @Data
-    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class TopProductDTO {
-        private String name;
-        private String imageUrl;
-        private Long soldCount;
         private BigDecimal revenue;
+        private Integer quantity;
     }
 }

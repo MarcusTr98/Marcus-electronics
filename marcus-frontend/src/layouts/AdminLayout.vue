@@ -72,7 +72,7 @@ const handleLogout = () => {
             >
               <router-link to="/admin" class="sidebar-link">
                 <i class="bi bi-grid-fill"></i>
-                <span>Bảng điều khiển</span>
+                <span>Admin Dashboard</span>
               </router-link>
             </li>
 
@@ -107,7 +107,7 @@ const handleLogout = () => {
                 </li>
                 <li class="submenu-item">
                   <router-link to="/admin/products/variants">
-                    <i class="bi bi-circle-fill"></i> Quản lý biến thể
+                    <i class="bi bi-circle-fill"></i> Quản lý Biến thể
                   </router-link>
                 </li>
                 <li class="submenu-item">
