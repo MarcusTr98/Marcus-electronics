@@ -1,0 +1,520 @@
+/* =========================================================
+   ADMIN GLOBAL STYLES - THE ULTIMATE CLEAN ARCHITECTURE
+   ========================================================= */
+
+:root {
+  /* BIẾN MÀU SẮC NÉT */
+  --text-main: #111111;
+  --text-secondary: #333333;
+  --text-muted: #555555;
+  --primary: #435ebe;
+  --primary-hover: #32499c;
+  --bg-main: #f8f9fa;
+  --border-color: #cbd5e1;
+}
+
+/* ── 1. GLOBAL TYPOGRAPHY & BODY ── */
+body {
+  color: var(--text-main);
+  background-color: var(--bg-main);
+  -webkit-font-smoothing: antialiased;
+}
+.text-muted {
+  color: var(--text-muted) !important;
+}
+.text-secondary {
+  color: var(--text-secondary) !important;
+}
+.text-dark {
+  color: var(--text-main) !important;
+}
+
+.page-content {
+  padding: 20px 0 60px;
+}
+.page-heading {
+  margin-bottom: 24px;
+}
+.page-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.page-title-text {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+.page-subtitle {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+/* ── 2. CARDS & KPI STAT CARDS ── */
+.card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border-color);
+}
+.card-header-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+.card-title-text {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+}
+
+/* KPI Cards (Đã ép padding 0.5rem theo yêu cầu) */
+.product-stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.pstat,
+.stat-card__body {
+  background: #fff;
+  border-radius: 12px;
+  padding: 0.5rem; /* Tối ưu diện tích nội dung đến viền */
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  flex: 1;
+  min-width: 140px;
+}
+.pstat i {
+  font-size: 1.5rem;
+}
+.pstat-val {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1;
+}
+.pstat-label {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ── 3. TOOLBARS & SEARCH ── */
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.toolbar-left {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #f8f9fc;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0 12px;
+  gap: 8px;
+  min-width: 220px;
+}
+.search-box i {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+.search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 8px 0;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  width: 100%;
+  font-weight: 500;
+}
+.filter-select {
+  background: #f8f9fc;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+}
+
+/* ── 4. TABLES & BADGES ── */
+.table-responsive {
+  overflow-x: auto;
+}
+.data-table,
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+.table-light th,
+.data-table th {
+  background-color: #f1f5f9 !important;
+  color: var(--text-main) !important;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
+}
+.table td,
+.data-table td {
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+.status-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.status-pill.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+.status-pill.inactive {
+  background: #f3f4f6;
+  color: #475569;
+}
+.status-pill.out-of-stock {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ── 5. BUTTONS & ACTIONS ── */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  font-weight: 600;
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+.btn-success {
+  background-color: #10b981;
+  border-color: #10b981;
+}
+.btn-success:hover {
+  background-color: #059669;
+  border-color: #059669;
+}
+
+.btn-add,
+.btn-save {
+  background: linear-gradient(135deg, #435ebe, #6c8cff);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(67, 94, 190, 0.3);
+}
+.btn-add:hover,
+.btn-save:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(67, 94, 190, 0.4);
+}
+.btn-cancel {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.btn-cancel:hover {
+  background: #e2e8f0;
+}
+.btn-delete {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-delete:hover {
+  background: #b91c1c;
+}
+
+.action-btns {
+  display: flex;
+  gap: 6px;
+}
+.action-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.15s;
+}
+.action-btn.view {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+.action-btn.view:hover {
+  background: #0369a1;
+  color: #fff;
+}
+.action-btn.edit {
+  background: #fef3c7;
+  color: #92400e;
+}
+.action-btn.edit:hover {
+  background: #f59e0b;
+  color: #fff;
+}
+.action-btn.delete {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.action-btn.delete:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* ── 6. MODALS & OVERLAYS ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  backdrop-filter: blur(4px);
+  padding: 20px;
+}
+.modal-box {
+  background: #fff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: modalIn 0.25s ease;
+}
+.modal-box.modal-sm {
+  max-width: 420px;
+}
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-header-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+.modal-header-custom h5 {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text-main);
+}
+.modal-close {
+  background: #f1f5f9;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+.modal-close:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.modal-body-custom {
+  padding: 18px 22px;
+}
+.modal-footer-custom {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px 18px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* ── 7. FORMS & INPUTS ── */
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.form-group-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.form-group-custom label,
+.modal-body-custom label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.form-control,
+.form-select,
+.form-group-custom input,
+.form-group-custom select,
+.form-group-custom textarea {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 0.875rem;
+  color: var(--text-main) !important;
+  font-weight: 500;
+  outline: none;
+  background: #f8fafc;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+.form-control:focus,
+.form-select:focus,
+.form-group-custom input:focus,
+.form-group-custom select:focus,
+.form-group-custom textarea:focus {
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(67, 94, 190, 0.15);
+}
+
+/* ── 8. TOASTS & ANIMATIONS ── */
+.toast-notif {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-main);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+.toast-notif i {
+  color: #4ade80;
+}
+.delete-confirm {
+  text-align: center;
+  padding: 10px 0;
+}
+.delete-icon {
+  font-size: 2.5rem;
+  color: #f59e0b;
+  margin-bottom: 12px;
+}
+.delete-confirm p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* ── 9. PAGINATION ── */
+.page-link {
+  color: var(--primary);
+  font-weight: 600;
+}
+.page-item.active .page-link {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* Transitions Vue */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.slide-up-enter-from,
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translate(-50%, 20px);
+}
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.3s ease;
+}
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translate(-50%, 10px);
+}

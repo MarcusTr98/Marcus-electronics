@@ -239,9 +239,9 @@ onMounted(() => {
                   </div>
                 </td>
                 <td class="text-center">
-                  <span class="badge bg-light text-dark border"
-                    >{{ customer.totalOrders || 0 }} đơn</span
-                  >
+                  <div class="bg-light text-success border">
+                    {{ customer.totalOrders || 0 }} đơn
+                  </div>
                 </td>
                 <td
                   class="text-end fw-bold"
@@ -255,7 +255,7 @@ onMounted(() => {
                 </td>
                 <td class="text-center">
                   <span
-                    class="badge px-3 py-2 rounded-pill"
+                    class="px-3 py-2 rounded-pill"
                     :class="
                       customer.isActive
                         ? 'bg-success-subtle text-success border border-success-subtle'
@@ -298,7 +298,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-@import "../../assets/css/product-manage.css";
-</style>

@@ -20,9 +20,10 @@ import InventoryManager from "../views/admin/InventoryManager.vue";
 import ProductVariantDetail from "../views/admin/ProductVariantDetail.vue";
 import CustomerManageView from "../views/admin/CustomerManageView.vue";
 import OrderManageView from "../views/admin/OrderManageView.vue";
-
+import ReportsView from "../views/admin/ReportsView.vue";
 import OrderSuccessView from "../views/client/OrderSuccessView.vue";
 import AllProductsView from "../views/client/AllProductsView.vue";
+import BlogManageView from "../views/admin/BlogManageView.vue";
 
 const routes = [
   // --- NHÓM TRANG KHÁCH HÀNG (Có Header/Footer)
@@ -101,6 +102,8 @@ const routes = [
         name: "admin-orders",
         component: OrderManageView,
       },
+      { path: "reports", name: "admin-reports", component: ReportsView },
+      { path: "blogs", name: "admin-blogs", component: BlogManageView },
     ],
   },
 ];

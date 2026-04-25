@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import api from "../../utils/api"; // Đã đổi sang dùng api.js để có Interceptor JWT
+import api from "../../utils/api";
 
-const API_URL = "/admin/categories"; // Rút gọn URL vì api.js đã cấu hình baseURL
+const API_URL = "/admin/categories";
 const categories = ref([]);
 const isLoading = ref(false);
 const showModal = ref(false);
@@ -11,7 +11,6 @@ const editingId = ref(null);
 const currentPage = 1;
 const pageSize = 10;
 
-// SỬA LỖI TẠI ĐÂY: Khởi tạo biến parentId chuẩn
 const form = ref({ name: "", parentId: null });
 
 const fetchCategories = async () => {
@@ -44,7 +43,6 @@ const openAddModal = () => {
 
 const editCategory = (cat) => {
   editingId.value = cat.id;
-  // Đồng bộ hóa các trường hợp backend trả về
   form.value = { name: cat.name, parentId: cat.parentId || cat.parent_id };
   showModal.value = true;
 };
@@ -52,10 +50,9 @@ const editCategory = (cat) => {
 const saveCategory = async () => {
   if (!form.value.name.trim()) return alert("Tên không được trống!");
 
-  // Payload chuẩn camelCase
   const payload = {
     name: form.value.name,
-    parentId: form.value.parentId, // Đã khớp biến
+    parentId: form.value.parentId,
   };
 
   try {
@@ -65,7 +62,7 @@ const saveCategory = async () => {
       await api.post(API_URL, payload);
     }
     showModal.value = false;
-    await fetchCategories(); // Tải lại danh sách
+    await fetchCategories();
     alert("Lưu danh mục thành công!");
   } catch (err) {
     const errorMsg =
@@ -90,8 +87,6 @@ const confirmDelete = async (id) => {
 const confirmRestore = async (id) => {
   if (confirm("Khôi phục hiển thị danh mục này?")) {
     try {
-      // Giả sử Backend có cấu hình API PUT /admin/categories/{id}/restore
-      // Nếu API của bạn đang là PATCH hoặc dạng khác, hãy sửa đổi dòng dưới cho khớp
       await api.put(`${API_URL}/${id}/restore`);
       await fetchCategories();
     } catch (err) {
@@ -109,7 +104,6 @@ onMounted(() => fetchCategories());
       <div class="page-title-row">
         <div>
           <h3 class="page-title-text">Quản lý danh mục</h3>
-          <p class="page-subtitle">Thêm, sửa, ẩn cấu trúc phân cấp danh mục</p>
         </div>
       </div>
     </div>

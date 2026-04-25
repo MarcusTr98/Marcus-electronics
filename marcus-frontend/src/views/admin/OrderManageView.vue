@@ -1,71 +1,123 @@
 <template>
   <div class="page-content">
-    <!-- Header -->
-    <div class="page-heading d-flex justify-content-between align-items-center">
+    <div
+      class="page-heading d-flex justify-content-between align-items-center mb-4"
+    >
       <h3 class="page-title-text">Quản lý Đơn hàng</h3>
       <button
         v-if="targetCustomerId"
-        class="btn btn-outline-secondary btn-sm"
+        class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold shadow-sm"
         @click="clearCustomerFilter"
       >
-        <i class="bi bi-x-circle"></i> Bỏ lọc khách hàng
+        <i class="bi bi-x-circle me-1"></i> Bỏ lọc khách hàng
       </button>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="row mb-4">
+    <div class="row mb-4 g-3">
       <div class="col-md-4">
-        <div class="stat-card stat-card--blue">
-          <div class="stat-card__body">
+        <div
+          class="card h-100 mb-0 shadow-sm"
+          style="
+            background: linear-gradient(135deg, #435ebe, #6c8cff);
+            color: white;
+            border: none;
+            border-radius: 12px;
+          "
+        >
+          <div
+            class="card-body d-flex justify-content-between align-items-center p-4"
+          >
             <div>
-              <h6 class="stat-card__label">Tổng đơn hàng</h6>
-              <h3 class="stat-card__value">{{ orders.length }}</h3>
+              <h6
+                class="text-white-50 fw-bold text-uppercase mb-2"
+                style="letter-spacing: 0.5px; font-size: 0.75rem"
+              >
+                Tổng đơn hàng
+              </h6>
+              <h3 class="mb-0 fw-bold text-white">{{ orders.length }}</h3>
             </div>
-            <i class="bi bi-box-seam stat-card__icon"></i>
+            <div class="fs-1 opacity-50"><i class="bi bi-box-seam"></i></div>
           </div>
         </div>
       </div>
+
       <div class="col-md-4">
-        <div class="stat-card stat-card--yellow">
-          <div class="stat-card__body">
+        <div
+          class="card h-100 mb-0 shadow-sm"
+          style="
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: white;
+            border: none;
+            border-radius: 12px;
+          "
+        >
+          <div
+            class="card-body d-flex justify-content-between align-items-center p-4"
+          >
             <div>
-              <h6 class="stat-card__label">Đang xử lý</h6>
-              <h3 class="stat-card__value">{{ pendingCount }}</h3>
+              <h6
+                class="text-white-50 fw-bold text-uppercase mb-2"
+                style="letter-spacing: 0.5px; font-size: 0.75rem"
+              >
+                Đang xử lý
+              </h6>
+              <h3 class="mb-0 fw-bold text-white">{{ pendingCount }}</h3>
             </div>
-            <i class="bi bi-hourglass-split stat-card__icon"></i>
+            <div class="fs-1 opacity-50">
+              <i class="bi bi-hourglass-split"></i>
+            </div>
           </div>
         </div>
       </div>
+
       <div class="col-md-4">
-        <div class="stat-card stat-card--green">
-          <div class="stat-card__body">
+        <div
+          class="card h-100 mb-0 shadow-sm"
+          style="
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            border: none;
+            border-radius: 12px;
+          "
+        >
+          <div
+            class="card-body d-flex justify-content-between align-items-center p-4"
+          >
             <div>
-              <h6 class="stat-card__label">Doanh thu</h6>
-              <h3 class="stat-card__value">
+              <h6
+                class="text-white-50 fw-bold text-uppercase mb-2"
+                style="letter-spacing: 0.5px; font-size: 0.75rem"
+              >
+                Doanh thu
+              </h6>
+              <h3 class="mb-0 fw-bold text-white">
                 {{ formatCurrency(totalRevenue) }}
               </h3>
             </div>
-            <i class="bi bi-cash-stack stat-card__icon"></i>
+            <div class="fs-1 opacity-50"><i class="bi bi-cash-stack"></i></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Order Table -->
-    <div class="card">
-      <div class="card-body">
-        <!-- Filters -->
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
         <div class="row mb-4">
-          <div class="col-md-4">
-            <input
-              v-model="searchQuery"
-              type="text"
-              class="form-control"
-              placeholder="Tìm theo tên, SĐT hoặc Mã đơn..."
-            />
+          <div class="col-md-5">
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"
+                ><i class="bi bi-search text-muted"></i
+              ></span>
+              <input
+                v-model="searchQuery"
+                type="text"
+                class="form-control border-start-0 ps-0"
+                placeholder="Tìm theo tên, SĐT hoặc Mã đơn..."
+              />
+            </div>
           </div>
           <div class="col-md-3">
-            <select v-model="filterStatus" class="form-select">
+            <select v-model="filterStatus" class="form-select fw-medium">
               <option value="ALL">Tất cả trạng thái</option>
               <option value="PENDING">Chờ xử lý</option>
               <option value="PROCESSING">Đang chuẩn bị hàng</option>
@@ -76,17 +128,15 @@
           </div>
         </div>
 
-        <!-- Loading -->
-        <div v-if="isLoading" class="text-center py-4">
+        <div v-if="isLoading" class="text-center py-5">
           <div class="spinner-border text-primary" role="status"></div>
         </div>
 
-        <!-- Table -->
         <div v-else class="table-responsive">
-          <table class="table table-hover align-middle border">
+          <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
               <tr>
-                <th>Mã Đơn</th>
+                <th class="ps-4">Mã Đơn</th>
                 <th>Khách hàng</th>
                 <th>Ngày đặt</th>
                 <th>Tổng tiền</th>
@@ -97,24 +147,29 @@
             </thead>
             <tbody>
               <tr v-if="filteredOrders.length === 0">
-                <td colspan="7" class="text-center text-muted py-4">
-                  Không có đơn hàng nào
+                <td colspan="7" class="text-center text-muted py-5">
+                  Không tìm thấy đơn hàng nào
                 </td>
               </tr>
               <tr v-for="order in filteredOrders" :key="order.id">
-                <td class="fw-bold text-primary">#ORD-{{ order.id }}</td>
+                <td class="fw-bold text-primary ps-4">#ORD-{{ order.id }}</td>
                 <td>
                   <div class="fw-bold text-dark">{{ order.fullName }}</div>
-                  <div class="small text-muted">{{ order.phoneNumber }}</div>
+                  <div class="small text-muted">
+                    <i class="bi bi-telephone me-1"></i>{{ order.phoneNumber }}
+                  </div>
                 </td>
-                <td>{{ formatDateTime(order.orderDate) }}</td>
-                <td class="text-danger fw-bold">
+                <td class="small text-muted fw-medium">
+                  {{ formatDateTime(order.orderDate) }}
+                </td>
+                <td class="text-success fw-bold">
                   {{ formatCurrency(order.totalMoney) }}
                 </td>
                 <td>
-                  <span class="badge bg-light text-dark border">{{
-                    order.paymentMethod
-                  }}</span>
+                  <span
+                    class="badge bg-light text-dark border px-3 py-2 rounded-pill"
+                    >{{ order.paymentMethod }}</span
+                  >
                 </td>
                 <td>
                   <select
@@ -132,7 +187,7 @@
                 </td>
                 <td class="text-center">
                   <button
-                    class="btn btn-sm btn-outline-info"
+                    class="btn btn-sm btn-outline-info rounded-3"
                     title="Xem chi tiết đơn hàng"
                     @click="openDetailModal(order)"
                   >
@@ -146,17 +201,16 @@
       </div>
     </div>
 
-    <!-- Order Detail Modal -->
     <div
       v-if="showDetailModal"
       class="modal-overlay"
       @click.self="showDetailModal = false"
     >
-      <div class="modal-box modal-lg modal-box--order-detail">
+      <div class="modal-box modal-lg">
         <div class="modal-header-custom">
           <h5>
             Chi tiết Đơn hàng
-            <span class="text-primary">#ORD-{{ selectedOrder?.id }}</span>
+            <span class="text-primary ms-1">#ORD-{{ selectedOrder?.id }}</span>
           </h5>
           <button class="modal-close" @click="showDetailModal = false">
             <i class="bi bi-x-lg"></i>
@@ -164,54 +218,59 @@
         </div>
 
         <div class="modal-body-custom">
-          <!-- Order Summary -->
-          <div class="row mb-3 bg-light p-3 rounded mx-0 border">
+          <div class="row mb-4 bg-light p-3 rounded-4 mx-0 border">
             <div class="col-md-6">
-              <p class="mb-1">
-                <strong>Khách hàng:</strong> {{ selectedOrder?.fullName }}
+              <p class="mb-2 text-dark">
+                <strong class="text-muted me-2">Khách hàng:</strong>
+                {{ selectedOrder?.fullName }}
               </p>
-              <p class="mb-1">
-                <strong>SĐT:</strong> {{ selectedOrder?.phoneNumber }}
+              <p class="mb-2 text-dark">
+                <strong class="text-muted me-2">SĐT:</strong>
+                {{ selectedOrder?.phoneNumber }}
               </p>
-              <p class="mb-0">
-                <strong>Ngày đặt:</strong>
+              <p class="mb-0 text-dark">
+                <strong class="text-muted me-2">Ngày đặt:</strong>
                 {{ formatDateTime(selectedOrder?.orderDate) }}
               </p>
             </div>
             <div class="col-md-6">
-              <p class="mb-1">
-                <strong>Địa chỉ:</strong> {{ selectedOrder?.address }}
+              <p class="mb-2 text-dark">
+                <strong class="text-muted me-2">Địa chỉ:</strong>
+                {{ selectedOrder?.address }}
               </p>
-              <p class="mb-1">
-                <strong>Ghi chú:</strong>
+              <p class="mb-2 text-dark">
+                <strong class="text-muted me-2">Ghi chú:</strong>
                 {{ selectedOrder?.note || "Không có" }}
               </p>
               <p class="mb-0">
-                <strong>Tổng thanh toán: </strong>
-                <span class="text-danger fw-bold">{{
+                <strong class="text-muted me-2">Tổng thanh toán: </strong>
+                <span class="text-danger fw-bold fs-5">{{
                   formatCurrency(selectedOrder?.totalMoney)
                 }}</span>
               </p>
             </div>
           </div>
 
-          <h6 class="fw-bold mb-3 border-bottom pb-2">Danh sách sản phẩm</h6>
+          <h6
+            class="fw-bold mb-3 text-dark text-uppercase"
+            style="letter-spacing: 0.5px"
+          >
+            Danh sách sản phẩm
+          </h6>
 
-          <!-- Loading Details -->
           <div v-if="isFetchingDetails" class="text-center py-4">
             <div class="spinner-border text-primary" role="status"></div>
           </div>
 
-          <!-- Details Table -->
-          <div v-else class="table-responsive">
-            <table class="table table-bordered align-middle text-sm">
+          <div v-else class="table-responsive border rounded-3">
+            <table class="table table-hover align-middle mb-0">
               <thead class="table-light">
                 <tr>
-                  <th class="text-center col-img">Ảnh</th>
-                  <th>Sản phẩm / Biến thể</th>
+                  <th class="text-center" style="width: 80px">Ảnh</th>
+                  <th>Sản phẩm / Phân loại</th>
                   <th class="text-center">Đơn giá</th>
                   <th class="text-center">SL</th>
-                  <th class="text-end">Thành tiền</th>
+                  <th class="text-end pe-4">Thành tiền</th>
                 </tr>
               </thead>
               <tbody>
@@ -219,19 +278,27 @@
                   <td class="text-center">
                     <img
                       :src="item.imageUrl || 'https://via.placeholder.com/60'"
-                      class="product-thumbnail"
+                      class="rounded-3 border"
+                      style="width: 50px; height: 50px; object-fit: contain"
                     />
                   </td>
                   <td>
-                    <div class="fw-bold text-dark">{{ item.productName }}</div>
+                    <div class="fw-bold text-dark mb-1">
+                      {{ item.productName }}
+                    </div>
                     <div class="small text-muted">{{ item.variantDetail }}</div>
-                    <code class="small text-primary">{{ item.skuCode }}</code>
+                    <code
+                      class="small text-primary bg-primary-subtle px-2 py-1 rounded"
+                      >{{ item.skuCode }}</code
+                    >
                   </td>
-                  <td class="text-center">
+                  <td class="text-center fw-medium text-dark">
                     {{ formatCurrency(item.unitPrice) }}
                   </td>
-                  <td class="text-center fw-bold">{{ item.quantity }}</td>
-                  <td class="text-end fw-bold text-danger">
+                  <td class="text-center fw-bold text-dark">
+                    {{ item.quantity }}
+                  </td>
+                  <td class="text-end fw-bold text-danger pe-4">
                     {{ formatCurrency(item.lineTotal) }}
                   </td>
                 </tr>
@@ -241,7 +308,10 @@
         </div>
 
         <div class="modal-footer-custom">
-          <button class="btn-cancel" @click="showDetailModal = false">
+          <button
+            class="btn btn-light border fw-bold px-4 rounded-3"
+            @click="showDetailModal = false"
+          >
             Đóng
           </button>
         </div>
@@ -257,7 +327,6 @@ import api from "../../utils/api";
 
 const route = useRoute();
 const router = useRouter();
-
 const orders = ref([]);
 const isLoading = ref(false);
 const searchQuery = ref("");
@@ -326,11 +395,11 @@ const updateStatus = async (orderId, newStatus) => {
 
 const statusColor = (status) => {
   const map = {
-    PENDING: "text-warning border-warning",
-    PROCESSING: "text-primary border-primary",
-    SHIPPED: "text-info border-info",
-    DELIVERED: "text-success border-success",
-    CANCELLED: "text-danger border-danger",
+    PENDING: "text-warning border-warning bg-warning-subtle",
+    PROCESSING: "text-primary border-primary bg-primary-subtle",
+    SHIPPED: "text-info border-info bg-info-subtle",
+    DELIVERED: "text-success border-success bg-success-subtle",
+    CANCELLED: "text-danger border-danger bg-danger-subtle",
   };
   return map[status] ?? "";
 };
@@ -374,78 +443,3 @@ onMounted(() => {
   fetchOrders();
 });
 </script>
-
-<style scoped>
-@import "../../assets/css/product-manage.css";
-
-/* Stat Cards */
-.stat-card {
-  height: 100%;
-  border: none;
-  border-radius: 12px;
-  color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.stat-card--blue {
-  background: linear-gradient(135deg, #435ebe, #6c8cff);
-}
-.stat-card--yellow {
-  background: linear-gradient(135deg, #f59e0b, #fbbf24);
-}
-.stat-card--green {
-  background: linear-gradient(135deg, #10b981, #34d399);
-}
-
-.stat-card__body {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-}
-
-.stat-card__label {
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-size: 0.75rem;
-  margin-bottom: 0.5rem;
-}
-
-.stat-card__value {
-  font-weight: 700;
-  margin-bottom: 0;
-}
-
-.stat-card__icon {
-  font-size: 2rem;
-  opacity: 0.5;
-}
-
-/* Table */
-.col-status {
-  width: 200px;
-}
-.col-img {
-  width: 60px;
-}
-
-.product-thumbnail {
-  width: 45px;
-  height: 45px;
-  object-fit: cover;
-  border-radius: 4px;
-}
-
-/* Modal */
-.modal-box--order-detail {
-  max-width: 800px;
-}
-
-/* Status select */
-select.form-select-sm {
-  background-position: right 0.25rem center;
-  padding-right: 1.5rem;
-}
-</style>

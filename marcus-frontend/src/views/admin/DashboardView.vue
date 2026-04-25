@@ -39,7 +39,7 @@ onMounted(() => fetchDashboardData());
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
         <h3 class="fw-bold text-dark mb-1">Admin Dashboard</h3>
-        <p class="text-muted small mb-0">
+        <p class="text-dark small mb-0">
           Tổng quan kinh doanh Marcus-Electronics
         </p>
       </div>
